@@ -1,0 +1,192 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<link rel="bookmark"  type="image/x-icon"  href="/img/favicon.ico"/>
+	<link rel="shortcut icon" href="/img/favicon.ico">
+	
+			    <title>
+    ACUPT
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/css/mic_main.css" />
+    <link rel="stylesheet" href="/css/dropdownMenu.css" />
+    <meta name="keywords" content="acupt" />
+    
+    	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+	 
+    <noscript>
+        <link rel="stylesheet" href="/css/noscript.css" />
+    </noscript>
+    <style type="text/css">
+        body:before {
+          content: ' ';
+          position: fixed;
+          top: 0;
+          background: url('/img/bg.jpg') center 0 no-repeat;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-size: cover; 
+        }
+    </style>
+
+			    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script async type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/main.js"></script>
+	
+</head>
+    
+		
+<!-- Layouts -->
+
+
+
+<!--  代码渲染  -->
+<link rel="stylesheet" href="/css/prism_coy.css" />
+<link rel="stylesheet" href="/css/typo.css" />
+<!-- 文章页 -->
+<body class="is-loading">
+    <!-- Wrapper 外包 s-->
+    <div id="wrapper" class="fade-in">
+        <!-- Intro 头部显示 s -->
+        <!-- Intro 头部显示 e -->
+        <!-- Header 头部logo start -->
+        <header id="header">
+    <a href="/" class="logo">acupt</a>
+</header>
+        <!-- Nav 导航条 start -->
+        <nav id="nav" class="special" >
+            <ul class="menu links" >
+			<!-- Homepage  主页  --> 
+			<li >
+	            <a href="/" rel="nofollow">HOME</a>
+	        </li>
+			<!-- categories_name  分类   --> 
+	        
+	        <!-- archives  归档   --> 
+	        
+	        
+		        <!-- Pages 自定义   -->
+		        
+		        <li>
+		            <a href="/work/" title="work">
+		                work
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/gallery/" title="gallery">
+		                gallery
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/about/" title="about">
+		                about
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tag/" title="tag">
+		                tag
+		            </a>
+		        </li>
+		        
+
+
+            </ul>
+            <!-- icons 图标   -->
+			<ul class="icons">
+		            
+		                <li><a href="https://github.com/acupt" class="icon fa-github"><span class="label">GitHub</span></a></li>
+		            
+		            
+		            
+		            
+			</ul>
+</nav>
+
+        <div id="main" >
+            <div class ="post_page_title_img" style="height: 25rem;background-image: url(/img/micro-service/sc.jpg);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >spring cloud 自定义配置源及配置刷新</h2></a>
+            </div>
+            <!-- Post -->
+            <div class="typo" style="padding: 3rem;">
+                <p>通过自定义配置源可以接入自己的配置服务，配合ContextRefresher可以让应用运行中自动更新配置。</p>
+<h3 id="实现PropertySourceLocator"><a href="#实现PropertySourceLocator" class="headerlink" title="实现PropertySourceLocator"></a>实现PropertySourceLocator</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 自定义配置源</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyPropertySourceLocator</span> <span class="keyword">implements</span> <span class="title">PropertySourceLocator</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> PropertySource&lt;?&gt; locate(Environment environment) &#123;</span><br><span class="line">        String msg = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"HH:mm:ss"</span>).format(<span class="keyword">new</span> Date());</span><br><span class="line"></span><br><span class="line">        Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">"demo.diy.msg"</span>, msg);</span><br><span class="line">        System.err.println(<span class="string">"MyPropertySourceLocator, demo.diy.msg = "</span> + msg);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//spring自带的一个简单的map结构配置集合，也可以继承PropertySource自定义</span></span><br><span class="line">        MapPropertySource source = <span class="keyword">new</span> MapPropertySource(<span class="string">"my-source"</span>, map);</span><br><span class="line">        <span class="keyword">return</span> source;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="配置类"><a href="#配置类" class="headerlink" title="配置类"></a>配置类</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyConfigBootstrapConfiguration</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> MyPropertySourceLocator <span class="title">myPropertySourceLocator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyPropertySourceLocator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用Java代码声明bean，还需要在resources/META-INF/spring.factories中声明</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">org.springframework.cloud.bootstrap.BootstrapConfiguration=\</span><br><span class="line">com.netease.ag.demoweb.MyConfigBootstrapConfiguration</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Spring中类似与Java SPI的加载机制。它在META-INF/spring.factories文件中配置接口的实现类名称，然后在程序中读取这些配置文件并实例化。这种自定义的SPI机制是Spring Boot Starter实现的基础。</p>
+</blockquote>
+<h3 id="使用自定义配置"><a href="#使用自定义配置" class="headerlink" title="使用自定义配置"></a>使用自定义配置</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RefreshScope</span> <span class="comment">//可更新</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ValueConfig</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;demo.copy.msg&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String copyMsg;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;demo.diy.msg&#125;"</span>)</span><br><span class="line">    <span class="keyword">private</span> String diyMsg;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ValueConfig</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.err.println(<span class="string">"ValueConfig init"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>application.properties中可以引用自定义配置</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">demo.copy.msg=$&#123;demo.diy.msg&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="springboot应用启动"><a href="#springboot应用启动" class="headerlink" title="springboot应用启动"></a>springboot应用启动</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemowebApplication</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> ValueConfig valueConfig;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Resource</span></span><br><span class="line">    <span class="keyword">private</span> ContextRefresher contextRefresher;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DemowebApplication</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.err.println(<span class="string">"DemowebApplication init"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(DemowebApplication.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/t"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">t</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> valueConfig.toString();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//更新bean属性</span></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/r"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">r</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> contextRefresher.refresh();</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>启动日志<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">  .   ____          _            __ _ _</span><br><span class="line"> /\\ / ___<span class="string">'_ __ _ _(_)_ __  __ _ \ \ \ \</span></span><br><span class="line"><span class="string">( ( )\___ | '</span>_ | <span class="string">'_| | '</span>_ \/ _` | \ \ \ \</span><br><span class="line"> \\/  ___)| |_)| | | | | || (_| |  ) ) ) )</span><br><span class="line">  <span class="string">'  |____| .__|_| |_|_| |_\__, | / / / /</span></span><br><span class="line"><span class="string"> =========|_|==============|___/=/_/_/_/</span></span><br><span class="line"><span class="string"> :: Spring Boot ::        (v1.5.2.RELEASE)</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">MyPropertySourceLocator, demo.diy.msg = 17:18:22</span></span><br><span class="line"><span class="string">...</span></span><br><span class="line"><span class="string">DemowebApplication init</span></span><br><span class="line"><span class="string">...</span></span><br><span class="line"><span class="string">ValueConfig init</span></span><br><span class="line"><span class="string">...Tomcat started on port(s): 8080 (http)</span></span><br></pre></td></tr></table></figure></p>
+<p>查询，多次请求返回一致</p>
+<blockquote>
+<p>请求：<a href="http://localhost:8080/t" target="_blank" rel="noopener">http://localhost:8080/t</a><br>响应：ValueConfig(copyMsg=17:18:22, diyMsg=17:18:22)</p>
+</blockquote>
+<p>更新</p>
+<blockquote>
+<p>请求：<a href="http://localhost:8080/r" target="_blank" rel="noopener">http://localhost:8080/r</a><br>响应：[“demo.diy.msg”]</p>
+</blockquote>
+<p>日志输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">MyPropertySourceLocator, demo.diy.msg = 17:27:44</span><br></pre></td></tr></table></figure></p>
+<p>再次调用查询接口，发现值改变，并且输出日志</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ValueConfig init</span><br></pre></td></tr></table></figure>
+<p>证明更新字段实际是重新生成了一个bean</p>
+
+            </div>
+
+            <!-- Post Comments -->
+            
+
+        </div>
+        <!-- Copyright 版权 start -->
+                <div id="copyright">
+            <ul>
+                <li>&copy;Powered By <a href="https://hexo.io/zh-cn/" style="border-bottom: none;">hexo</a></li>
+                <li>Design: <a href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
+            </ul>
+            
+            	<span id="busuanzi_container_site_pv">2018总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+			
+        </div>
+    </div>
+</body>
+
+
+
+ 	
+</html>
