@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<link rel="bookmark"  type="image/x-icon"  href="/img/favicon.ico"/>
+	<link rel="shortcut icon" href="/img/favicon.ico">
+	
+			    <title>
+    ACUPT
+    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="/css/mic_main.css" />
+    <link rel="stylesheet" href="/css/dropdownMenu.css" />
+    <meta name="keywords" content="acupt" />
+    
+    	<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+	 
+    <noscript>
+        <link rel="stylesheet" href="/css/noscript.css" />
+    </noscript>
+    <style type="text/css">
+        body:before {
+          content: ' ';
+          position: fixed;
+          top: 0;
+          background: url('/img/bg.jpg') center 0 no-repeat;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-size: cover; 
+        }
+    </style>
+
+			    
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script async type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery.scrollex.min.js"></script>
+    <script src="/js/jquery.scrolly.min.js"></script>
+    <script src="/js/skel.min.js"></script>
+    <script src="/js/util.js"></script>
+    <script src="/js/main.js"></script>
+	
+</head>
+    
+		
+<!-- Layouts -->
+
+
+
+<!--  代码渲染  -->
+<link rel="stylesheet" href="/css/prism_coy.css" />
+<link rel="stylesheet" href="/css/typo.css" />
+<!-- 文章页 -->
+<body class="is-loading">
+    <!-- Wrapper 外包 s-->
+    <div id="wrapper" class="fade-in">
+        <!-- Intro 头部显示 s -->
+        <!-- Intro 头部显示 e -->
+        <!-- Header 头部logo start -->
+        <header id="header">
+    <a href="/" class="logo">acupt</a>
+</header>
+        <!-- Nav 导航条 start -->
+        <nav id="nav" class="special" >
+            <ul class="menu links" >
+			<!-- Homepage  主页  --> 
+			<li >
+	            <a href="/" rel="nofollow">HOME</a>
+	        </li>
+			<!-- categories_name  分类   --> 
+	        
+	        <!-- archives  归档   --> 
+	        
+	        
+		        <!-- Pages 自定义   -->
+		        
+		        <li>
+		            <a href="/work/" title="work">
+		                work
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/gallery/" title="gallery">
+		                gallery
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/about/" title="about">
+		                about
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tag/" title="tag">
+		                tag
+		            </a>
+		        </li>
+		        
+		        <li>
+		            <a href="/tool/my-wx.html" title="我已经发朋友圈了">
+		                我已经发朋友圈了
+		            </a>
+		        </li>
+		        
+
+
+            </ul>
+            <!-- icons 图标   -->
+			<ul class="icons">
+		            
+		                <li><a href="https://github.com/acupt" class="icon fa-github"><span class="label">GitHub</span></a></li>
+		            
+		            
+		            
+		            
+			</ul>
+</nav>
+
+        <div id="main" >
+            <div class ="post_page_title_img" style="height: 25rem;background-image: url(/img/code.jpg);background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >spring rabbitmq 异常重试源码分析</h2></a>
+            </div>
+            <!-- Post -->
+            <div class="typo" style="padding: 3rem;">
+                <h2 id="springboot集成rabbitMQ"><a href="#springboot集成rabbitMQ" class="headerlink" title="springboot集成rabbitMQ"></a>springboot集成rabbitMQ</h2><h3 id="发消息"><a href="#发消息" class="headerlink" title="发消息"></a>发消息</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Resource</span></span><br><span class="line"><span class="keyword">private</span> RabbitTemplate rabbitTemplate;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Value</span>(<span class="string">"$&#123;my.exchange&#125;"</span>)</span><br><span class="line"><span class="keyword">private</span> String exchange;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">    rabbitTemplate.convertAndSend(exchange, <span class="string">""</span>, JsonUtils.toJson(obj));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="处理消息"><a href="#处理消息" class="headerlink" title="处理消息"></a>处理消息</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RabbitListener</span>(queues = <span class="string">"$&#123;msg.queue.my.exchange&#125;"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">receive</span><span class="params">(String msg)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>默认情况下，如果处理消息时抛出了异常，这个消息会一直重复消费（重复调用receive方法），直到没有抛异常。</p>
+<h2 id="消息接收-处理流程分析"><a href="#消息接收-处理流程分析" class="headerlink" title="消息接收/处理流程分析"></a>消息接收/处理流程分析</h2><p>在@RabbitListener注解的方法里打个断点，观察下调用栈。</p>
+<p><img src="/img/spring/rabbitmq-listener-debug.jpg" alt=""></p>
+<p>末端是个实现了Runnable的内部类SimpleMessageListenerContainer$AsyncMessageProcessingConsumer</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">//……</span></span><br><span class="line">    <span class="comment">//从这里可以看出只要这个消费者（consumer）状态满足会一直轮询去接收消息和消费消息</span></span><br><span class="line">    <span class="keyword">while</span> (isActive(<span class="keyword">this</span>.consumer) || <span class="keyword">this</span>.consumer.hasDelivery() || !<span class="keyword">this</span>.consumer.cancelled()) &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">  	<span class="keyword">boolean</span> receivedOk = receiveAndExecute(<span class="keyword">this</span>.consumer); <span class="comment">// At least one message received</span></span><br><span class="line">   <span class="comment">//……</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//……</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">doReceiveAndExecute</span><span class="params">(BlockingQueueConsumer consumer)</span> <span class="keyword">throws</span> Throwable </span>&#123; <span class="comment">//NOSONAR</span></span><br><span class="line">	Channel channel = consumer.getChannel();</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="keyword">this</span>.txSize; i++) &#123;</span><br><span class="line">		logger.trace(<span class="string">"Waiting for message from consumer."</span>);</span><br><span class="line">		Message message = consumer.nextMessage(<span class="keyword">this</span>.receiveTimeout);</span><br><span class="line">		<span class="keyword">if</span> (message == <span class="keyword">null</span>) &#123;<span class="keyword">break</span>;&#125;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			<span class="comment">//如果获取到了消息就会去消费，这里最终会执行到我们写的listener方法</span></span><br><span class="line">			executeListener(channel, message);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">//当我们写的方法抛异常的时候就会来到这里</span></span><br><span class="line">		<span class="comment">//发现嫌疑代码：consumer.rollbackOnExceptionIfNecessary(ex)</span></span><br><span class="line">		<span class="keyword">catch</span> (ImmediateAcknowledgeAmqpException e) &#123;<span class="comment">/*……*/</span>&#125;</span><br><span class="line">		<span class="keyword">catch</span> (Throwable ex) &#123; <span class="comment">//NOSONAR</span></span><br><span class="line">			<span class="keyword">if</span> (causeChainHasImmediateAcknowledgeAmqpException(ex)) &#123;<span class="comment">/*……*/</span>&#125;</span><br><span class="line">			<span class="keyword">if</span> (<span class="keyword">this</span>.transactionManager != <span class="keyword">null</span>) &#123;<span class="comment">/*没开事务，忽略*/</span>&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				consumer.rollbackOnExceptionIfNecessary(ex);</span><br><span class="line">				<span class="keyword">throw</span> ex;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> consumer.commitIfNecessary(isChannelLocallyTransacted(channel));</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">rollbackOnExceptionIfNecessary</span><span class="params">(Throwable ex)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">	<span class="keyword">boolean</span> ackRequired = !<span class="keyword">this</span>.acknowledgeMode.isAutoAck() &amp;&amp; !<span class="keyword">this</span>.acknowledgeMode.isManual();</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (<span class="keyword">this</span>.transactional) &#123;<span class="comment">/*……*/</span>&#125;</span><br><span class="line">		<span class="keyword">if</span> (ackRequired) &#123;</span><br><span class="line">			<span class="keyword">boolean</span> shouldRequeue = RabbitUtils.shouldRequeue(<span class="keyword">this</span>.defaultRequeuRejected, ex, logger);</span><br><span class="line">			<span class="keyword">for</span> (Long deliveryTag : <span class="keyword">this</span>.deliveryTags) &#123;</span><br><span class="line">				<span class="comment">// 最终会执行到这里</span></span><br><span class="line">				<span class="comment">// With newer RabbitMQ brokers could use basicNack here...</span></span><br><span class="line">				<span class="keyword">this</span>.channel.basicReject(deliveryTag, shouldRequeue);</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">if</span> (<span class="keyword">this</span>.transactional) &#123;<span class="comment">/*……*/</span>&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">		logger.error(<span class="string">"Application exception overridden by rollback exception"</span>, ex);</span><br><span class="line">		<span class="keyword">throw</span> e;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">finally</span> &#123;</span><br><span class="line">		<span class="keyword">this</span>.deliveryTags.clear();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>由上可看出，导致无限重试的两个值：</p>
+<ul>
+<li>ackRequired: 和ack模式相关</li>
+<li>shouldRequeue: 和defaultRequeuRejected以及抛出的异常类型有关</li>
+</ul>
+<p>根据需要修改acknowledgeMode或者defaultRequeuRejected即可，在配置文件中根据IDE补全提示可以找到这两个属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">spring.rabbitmq.listener.acknowledge-mode=none</span><br><span class="line">spring.rabbitmq.listener.default-requeue-rejected=false</span><br></pre></td></tr></table></figure>
+<p>如果只是不想异常时重试，直接在业务代码中try…catch全部代码不让抛异常也行。</p>
+<p>PS：验证这两个配置的时候发现不生效，一番debug发现项目里面自定义了一个工厂bean，创建消费者相关对象时用的那个工厂bean，而不是根据配置属性生成。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Bean</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> SimpleRabbitListenerContainerFactory <span class="title">rabbitListenerContainerFactory</span><span class="params">(ConnectionFactory connectionFactory)</span> </span>&#123;</span><br><span class="line">    SimpleRabbitListenerContainerFactory factory = <span class="keyword">new</span> SimpleRabbitListenerContainerFactory();</span><br><span class="line">    factory.setConnectionFactory(connectionFactory);</span><br><span class="line">    factory.setMessageConverter(<span class="keyword">new</span> Jackson2JsonMessageConverter());</span><br><span class="line">    <span class="keyword">return</span> factory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注释掉这个bean那两个配置才生效，当然也可以在这个bean里设置那两个属性。</p>
+
+            </div>
+
+            <!-- Post Comments -->
+            
+
+        </div>
+        <!-- Copyright 版权 start -->
+                <div id="copyright">
+            <ul>
+                <li>&copy;Powered By <a href="https://hexo.io/zh-cn/" style="border-bottom: none;">hexo</a></li>
+                <li>Design: <a href="http://miccall.tech " style="border-bottom: none;">miccall</a></li>
+            </ul>
+            
+            	<span id="busuanzi_container_site_pv">2018总访问量<span id="busuanzi_value_site_pv"></span>次</span>
+			
+        </div>
+    </div>
+</body>
+
+
+
+ 	
+</html>
