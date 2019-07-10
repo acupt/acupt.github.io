@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="">
+<html lang="zh-CN">
 <head>
     <!--Setting-->
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta name="renderer" content="webkit|ie-comp|ie-stand">
-    <meta name="apple-mobile-web-app-capable" content="ACUPT">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no,email=no,adress=no">
     <meta name="browsermode" content="application">
@@ -33,13 +33,13 @@
     <!--Title-->
 
 
-<title>github+hexo搭建个人主页 | ACUPT</title>
+<title>github+hexo搭建个人主页 | 一杯82年的JAVA</title>
 
 
-    <link rel="alternate" href="/atom.xml" title="ACUPT" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
 
 
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/img/favicon.ico">
 
     
 
@@ -87,7 +87,7 @@
         <div class="branding">
         	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
             
-                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+                <h2>   </h2>
             
     	</div>
     </div>
@@ -100,25 +100,29 @@
                     <span class="sr-only"></span>
                         <i class="fa fa-bars"></i>
                     </span>
-                    <a class="navbar-brand" href="https://acupt.github.io">ACUPT</a>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
                 </div>
                 <div class="collapse navbar-collapse" id="main-menu">
                     <ul class="menu">
                         
                             <li role="presentation" class="text-center">
-                                <a href="/"><i class="fa "></i>Home</a>
+                                <a href="/"><i class="fa "></i>HOME</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                                <a href="/categories/article/"><i class="fa "></i>博文</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                                <a href="/categories/code/"><i class="fa "></i>代码</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
@@ -168,6 +172,11 @@
             <i class="fa fa-clock-o"></i>
             <span class="date-meta">2018/05/20</span>
         </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
         
     
 </div>
@@ -251,7 +260,7 @@
     <div class="post-footer">
         <div>
             
-                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
             
         </div>
         <div>
@@ -296,7 +305,7 @@
             meta: 'nick,mail'.split(','),
             pageSize: '10',
             path: window.location.pathname,
-            lang: ''.toLowerCase()
+            lang: 'zh-CN'.toLowerCase()
         })
     </script>
 
@@ -311,7 +320,7 @@
                 
                     <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-        <h3 class="title">Table of Contents</h3>
+        <h3 class="title">文章目录</h3>
         
             <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#github个人主页创建"><span class="toc-text">github个人主页创建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#新建仓库"><span class="toc-text">新建仓库</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改主页"><span class="toc-text">修改主页</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo搭建个人主页"><span class="toc-text">hexo搭建个人主页</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装hexo"><span class="toc-text">安装hexo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#启动hexo"><span class="toc-text">启动hexo</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#写文章"><span class="toc-text">写文章</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#修改主题"><span class="toc-text">修改主题</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#下载主题"><span class="toc-text">下载主题</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#主题模板配置"><span class="toc-text">主题模板配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#重启服务"><span class="toc-text">重启服务</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#hexo发布个人主页到github"><span class="toc-text">hexo发布个人主页到github</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#技术性改进"><span class="toc-text">技术性改进</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#links布局配置可选"><span class="toc-text">links布局配置可选</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#https站内访问http资源受限"><span class="toc-text">https站内访问http资源受限</span></a></li></ol></li></ol>
         
@@ -342,11 +351,21 @@
             <div class="col-sm-12">
                 <div class="busuanzi">
     
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
 </div>
 
             </div>
             <div class="col-sm-12">
-                <span>Copyright &copy; 2017
+                <span>Copyright &copy; 2019
                 </span> |
                 <span>
                     Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
@@ -363,6 +382,8 @@
 
 
 
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
 <script src="/js/app.js?rev=@@hash"></script>

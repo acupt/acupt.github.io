@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html lang="">
+<html lang="zh-CN">
 <head>
     <!--Setting-->
     <meta charset="UTF-8">
@@ -8,7 +8,7 @@
     <meta http-equiv="Cache-Control" content="no-siteapp">
     <meta http-equiv="Cache-Control" content="no-transform">
     <meta name="renderer" content="webkit|ie-comp|ie-stand">
-    <meta name="apple-mobile-web-app-capable" content="ACUPT">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no,email=no,adress=no">
     <meta name="browsermode" content="application">
@@ -42,13 +42,13 @@ thrift –version
     <!--Title-->
 
 
-<title>thrift-Java 示例 | ACUPT</title>
+<title>thrift-Java 示例 | 一杯82年的JAVA</title>
 
 
-    <link rel="alternate" href="/atom.xml" title="ACUPT" type="application/atom+xml">
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
 
 
-    <link rel="icon" href="/favicon.ico">
+    <link rel="icon" href="/img/favicon.ico">
 
     
 
@@ -96,7 +96,7 @@ thrift –version
         <div class="branding">
         	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
             
-                 <img src="/img/branding.png" alt="Snippet 博客主题" class="img-responsive center-block">
+                <h2>   </h2>
             
     	</div>
     </div>
@@ -109,25 +109,29 @@ thrift –version
                     <span class="sr-only"></span>
                         <i class="fa fa-bars"></i>
                     </span>
-                    <a class="navbar-brand" href="https://acupt.github.io">ACUPT</a>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
                 </div>
                 <div class="collapse navbar-collapse" id="main-menu">
                     <ul class="menu">
                         
                             <li role="presentation" class="text-center">
-                                <a href="/"><i class="fa "></i>Home</a>
+                                <a href="/"><i class="fa "></i>HOME</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/前端/"><i class="fa "></i>前端</a>
+                                <a href="/categories/article/"><i class="fa "></i>博文</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/后端/"><i class="fa "></i>后端</a>
+                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/工具/"><i class="fa "></i>工具</a>
+                                <a href="/categories/code/"><i class="fa "></i>代码</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
@@ -178,6 +182,11 @@ thrift –version
             <span class="date-meta">2018/11/20</span>
         </span>
         
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
     
 </div>
             
@@ -217,7 +226,7 @@ thrift –version
     <div class="post-footer">
         <div>
             
-                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
             
         </div>
         <div>
@@ -227,11 +236,6 @@ thrift –version
 </article>
 
 <div class="article-nav prev-next-wrap clearfix">
-    
-        <a href="/2018/12/29/jmap-histo/" class="pre-post btn btn-default" title=''>
-            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs"></span>
-        </a>
     
     
         <a href="/2018/11/15/spring-rabbitmq-retry/" class="next-post btn btn-default" title='spring rabbitmq 异常重试源码分析'>
@@ -262,7 +266,7 @@ thrift –version
             meta: 'nick,mail'.split(','),
             pageSize: '10',
             path: window.location.pathname,
-            lang: ''.toLowerCase()
+            lang: 'zh-CN'.toLowerCase()
         })
     </script>
 
@@ -277,7 +281,7 @@ thrift –version
                 
                     <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-        <h3 class="title">Table of Contents</h3>
+        <h3 class="title">文章目录</h3>
         
             <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装thrift"><span class="toc-text">安装thrift</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#新建maven项目"><span class="toc-text">新建maven项目</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#定义服务"><span class="toc-text">定义服务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#构建"><span class="toc-text">构建</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码"><span class="toc-text">代码</span></a></li></ol>
         
@@ -308,11 +312,21 @@ thrift –version
             <div class="col-sm-12">
                 <div class="busuanzi">
     
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
 </div>
 
             </div>
             <div class="col-sm-12">
-                <span>Copyright &copy; 2017
+                <span>Copyright &copy; 2019
                 </span> |
                 <span>
                     Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
@@ -329,6 +343,8 @@ thrift –version
 
 
 
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
 <script src="/js/app.js?rev=@@hash"></script>
