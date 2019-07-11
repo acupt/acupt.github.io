@@ -1,0 +1,341 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="微服务,eureka" />
+
+
+    <meta name="description" content="
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+123- acuprpc    + acuprpc-core  //server/client核心处理逻辑    + ..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>从0.5到1写个rpc框架 - 1:服务注册/发现(eureka) | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/article/"><i class="fa "></i>博文</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/code/"><i class="fa "></i>代码</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)">
+            
+	            从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/微服务/">微服务</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2018/11/29</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">- acuprpc</span><br><span class="line">    + acuprpc-core  //server/client核心处理逻辑</span><br><span class="line">    + acuprpc-spring-boot-starter  //server端服务扫描，client端动态代理，服务注册/发现</span><br></pre></td></tr></table></figure>
+<h2 id="Eureka-Server"><a href="#Eureka-Server" class="headerlink" title="Eureka Server"></a>Eureka Server</h2><p><a href="https://blog.csdn.net/forezp/article/details/69696915" target="_blank" rel="noopener">spring-cloud-starter-eureka-server</a></p>
+<h2 id="Eureka-Client"><a href="#Eureka-Client" class="headerlink" title="Eureka Client"></a>Eureka Client</h2><p>原理就是利用eureka提供的客户端类来向Eureka Server发送注册请求，把自己提供服务的地址和端口（rpc服务端口，不是springboot启动的http端口）告诉注册中心，这样其他客户端（包括自身）就可以请求Eureka Server获取需要的服务节点信息。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 在服务中心注册的实例</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Getter</span></span><br><span class="line"><span class="meta">@Slf</span>4j</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcInstance</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> EurekaClient eurekaClient;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ApplicationInfoManager applicationInfoManager;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcConf rpcConf;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcInstance</span><span class="params">(RpcConf rpcConf)</span> </span>&#123;</span><br><span class="line">        RpcEurekaInstanceConfig instanceConfig = <span class="keyword">new</span> RpcEurekaInstanceConfig();</span><br><span class="line"></span><br><span class="line">        instanceConfig.setAppGroupName(rpcConf.getAppGroup());</span><br><span class="line">        instanceConfig.setAppname(rpcConf.getAppName());</span><br><span class="line">        instanceConfig.setNonSecurePort(rpcConf.getPort());</span><br><span class="line">        instanceConfig.setIpAddress(IpUtil.INTRANET_IP);</span><br><span class="line">        instanceConfig.setHostname(IpUtil.HOSTNAME);</span><br><span class="line"></span><br><span class="line">        RpcEurekaClientConfig clientConfig = <span class="keyword">new</span> RpcEurekaClientConfig();</span><br><span class="line">        clientConfig.getServiceUrl().put(<span class="string">"default"</span>, rpcConf.getDiscoveryServiceUrl());</span><br><span class="line">        clientConfig.setRegisterWithEureka(rpcConf.isRegisterWithDiscovery());</span><br><span class="line"></span><br><span class="line">        InstanceInfo instanceInfo = <span class="keyword">new</span> EurekaConfigBasedInstanceInfoProvider(instanceConfig).get();</span><br><span class="line">        <span class="keyword">this</span>.applicationInfoManager = <span class="keyword">new</span> ApplicationInfoManager(instanceConfig, instanceInfo);</span><br><span class="line">        <span class="keyword">this</span>.eurekaClient = <span class="keyword">new</span> DiscoveryClient(applicationInfoManager, clientConfig);</span><br><span class="line">        <span class="keyword">this</span>.rpcConf = rpcConf;</span><br><span class="line">        log.info(<span class="string">"protocol server -&gt; "</span> + rpcConf.getRpcServerClass());</span><br><span class="line">        log.info(<span class="string">"protocol client -&gt; "</span> + rpcConf.getRpcClientClass());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.STARTING);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">started</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.UP);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        applicationInfoManager.setInstanceStatus(InstanceInfo.InstanceStatus.DOWN);</span><br><span class="line">        eurekaClient.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建一个rpc server，根据配置的调用方式（实现类）生成对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@SneakyThrows</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RpcServer <span class="title">newRpcServer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> rpcConf.getRpcServerClass().getConstructor(RpcInstance.class).newInstance(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建一个rpc client，根据配置的调用方式（实现类）生成对象</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@SneakyThrows</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> RpcClient <span class="title">newRpcClient</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> rpcConf.getRpcClientClass().getConstructor(NodeInfo.class).newInstance(nodeInfo);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="starter"><a href="#starter" class="headerlink" title="starter"></a>starter</h2><p>构建一个自己的spring boot starter，这样别的项目只需要引入这个依赖，就能使用starter提供的服务了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- resources</span><br><span class="line">    - META-INF</span><br><span class="line">        spring.factories // 定义@Configuration类的路径，有了这个声明依赖starter的项目就能获得starter中提供的bean</span><br><span class="line">        spring-configuration-metadata.json // 配置信息（可选），有了它在IDE中编辑application配置文件可以看到提示信息</span><br></pre></td></tr></table></figure>
+<h3 id="rpc-server-服务管理"><a href="#rpc-server-服务管理" class="headerlink" title="rpc server 服务管理"></a>rpc server 服务管理</h3><p>作为rpc服务提供者，需要在应用启动时把有注解（@Rpc）的服务管理起来，这样接收到rpc请求后可以快速查询到指定对象，执行指定方法。</p>
+<p>实现接口BeanPostProcessor的bean即可得到处理spring中的所有bean（每个bean初始化完成后会调用接口方法）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcServiceScanner</span> <span class="keyword">implements</span> <span class="title">BeanPostProcessor</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcServer rpcServer;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcServiceScanner</span><span class="params">(RpcServer rpcServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcServer = rpcServer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessBeforeInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">postProcessAfterInitialization</span><span class="params">(Object bean, String beanName)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span><br><span class="line">        <span class="comment">// AOP代理类需要拿到原始的类，不然读不到类上的注解</span></span><br><span class="line">        Class&lt;?&gt; beanClass = AopUtils.isAopProxy(bean) ? AopUtils.getTargetClass(bean) : bean.getClass();</span><br><span class="line">        val nrpc = beanClass.getAnnotation(Rpc.class);</span><br><span class="line">        <span class="keyword">if</span> (nrpc == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Method[] methods = beanClass.getDeclaredMethods();</span><br><span class="line">        <span class="keyword">if</span> (methods.length == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125;</span><br><span class="line">        Map&lt;String, MethodInfo&gt; methodInfoMap = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">            methodInfoMap.put(method.getName(), <span class="keyword">new</span> MethodInfo(method));</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Class&lt;?&gt;[] interfaces = beanClass.getInterfaces();</span><br><span class="line">        <span class="keyword">if</span> (interfaces.length == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> bean;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// client是通过接口调用server的，因此并不知道具体实现类的路径，只有接口名，因此把所有接口都注册一遍</span></span><br><span class="line">        <span class="keyword">for</span> (Class&lt;?&gt; serviceInterface : interfaces) &#123;</span><br><span class="line">            rpcServer.registerService(</span><br><span class="line">                    <span class="keyword">new</span> RpcServiceInfo(rpcServer.getRpcInstance().getRpcConf().getAppName(),</span><br><span class="line">                            serviceInterface.getCanonicalName()),</span><br><span class="line">                    bean,</span><br><span class="line">                    serviceInterface,</span><br><span class="line">                    methodInfoMap);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> bean;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="rpc-client-远程服务代理"><a href="#rpc-client-远程服务代理" class="headerlink" title="rpc client 远程服务代理"></a>rpc client 远程服务代理</h3><p>作为服务调用者，可以通过接口像调用本地代码一样调用远程服务，原理就是为接口创建一个代理，在代理中进行远程调用。</p>
+<p>这里使用主动创建代理的方式。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcServiceConsumer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcClientManager rpcClientManager;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcServiceConsumer</span><span class="params">(RpcClientManager rpcClientManager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcClientManager = rpcClientManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">    <span class="keyword">public</span> &lt;T&gt; <span class="function">T <span class="title">create</span><span class="params">(String appName, Class&lt;T&gt; serviceInterface)</span> </span>&#123;</span><br><span class="line">        RpcServiceInfo serviceInfo = <span class="keyword">new</span> RpcServiceInfo(appName, serviceInterface.getCanonicalName());</span><br><span class="line">        <span class="keyword">return</span> (T) Proxy.newProxyInstance(</span><br><span class="line">                serviceInterface.getClassLoader(),</span><br><span class="line">                <span class="keyword">new</span> Class&lt;?&gt;[]&#123;serviceInterface&#125;,</span><br><span class="line">                <span class="keyword">new</span> RpcInvocationHandler(serviceInfo, rpcClientManager));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcServiceInfo rpcServiceInfo;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcServiceManager rpcServiceManager;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcClient rpcClient;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcInvocationHandler</span><span class="params">(RpcServiceInfo rpcServiceInfo, RpcServiceManager rpcServiceManager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcServiceInfo = rpcServiceInfo;</span><br><span class="line">        <span class="keyword">this</span>.rpcServiceManager = rpcServiceManager;</span><br><span class="line">        tryInitRpcClient(<span class="keyword">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">        RpcMethodInfo methodInfo = <span class="keyword">new</span> RpcMethodInfo(rpcServiceInfo, method.getName(), method.getGenericReturnType());</span><br><span class="line">        <span class="keyword">return</span> tryGetRpcClient().invoke(methodInfo, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> RpcClient <span class="title">tryGetRpcClient</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (rpcClient == <span class="keyword">null</span>) &#123;</span><br><span class="line">            tryInitRpcClient(<span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> rpcClient;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">tryInitRpcClient</span><span class="params">(<span class="keyword">boolean</span> throwError)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (rpcClient != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            rpcClient = rpcServiceManager.lookup(rpcServiceInfo);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">if</span> (throwError) &#123;</span><br><span class="line">                <span class="keyword">throw</span> e;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注册一个ApplicationListener，接收springboot程序准备完后的信号，然后告诉注册中心准备好了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RpcApplicationListener</span> <span class="keyword">implements</span> <span class="title">ApplicationListener</span>&lt;<span class="title">ApplicationReadyEvent</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcServer rpcServer;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">RpcApplicationListener</span><span class="params">(RpcServer rpcServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcServer = rpcServer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onApplicationEvent</span><span class="params">(ApplicationReadyEvent event)</span> </span>&#123;</span><br><span class="line">        rpcServer.started();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2018/11/29/acuprpc-2/" class="pre-post btn btn-default" title='从0.5到1写个rpc框架 - 2:远程服务调用(grpc)'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 2:远程服务调用(grpc)</span>
+        </a>
+    
+    
+        <a href="/2018/11/20/thrift-start/" class="next-post btn btn-default" title='thrift-Java 示例'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">thrift-Java 示例</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Eureka-Server"><span class="toc-text">Eureka Server</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Eureka-Client"><span class="toc-text">Eureka Client</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#starter"><span class="toc-text">starter</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rpc-server-服务管理"><span class="toc-text">rpc server 服务管理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rpc-client-远程服务代理"><span class="toc-text">rpc client 远程服务代理</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2019
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

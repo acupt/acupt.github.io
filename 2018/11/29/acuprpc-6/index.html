@@ -18,10 +18,14 @@
     <link rel="dns-prefetch" href="https://acupt.github.io">
     <!--SEO-->
 
-    <meta name="keywords" content="" />
+    <meta name="keywords" content="微服务,eureka" />
 
 
-    <meta name="description" content="" />
+    <meta name="description" content="
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+eureka client每隔30s向注册中心发送心跳来给自己续命，因此
+" />
 
 
 
@@ -33,7 +37,7 @@
     <!--Title-->
 
 
-<title>标签: config | 一杯82年的JAVA</title>
+<title>从0.5到1写个rpc框架 - 6:调用异常节点自动重试 | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -138,43 +142,107 @@
     <section class="content-wrap">
         <div class="container">
             <div class="row">
-                <main class="col-md-8 main-content ">
-                    <ol class="breadcrumb">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="从0.5到1写个rpc框架 - 6:调用异常节点自动重试">
+            
+	            从0.5到1写个rpc框架 - 6:调用异常节点自动重试
+            
+        </h1>
+        <div class="post-meta">
     
-    
-        <li>
-            config
-        </li>
-    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/微服务/">微服务</a>
+        </span>
     
 
-</ol>
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                
+            </span>
+        </span>
+    
 
-
-    <article class="post">
+    
         
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2018/10/29/spring-cloud-source-diy/">spring cloud 自定义配置源及配置刷新</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2018年10月29日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    通过自定义配置源可以接入自己的配置服务，配合ContextRefresher可以让应用运行中自动更新配置。
-实现PropertySourceLocator123456789101112131415161718/** * 自定义配置源 ...
-                
-            </p>
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2018/11/29</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
+</blockquote>
+<p>eureka client每隔30s向注册中心发送心跳来给自己续命，因此</p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
         </div>
-    </article>
- 
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2018/11/29/acuprpc-0/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 0'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 0</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
 
 
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
 
 
 
@@ -182,85 +250,14 @@
 
                 </main>
                 
-                    
-    <aside class="col-md-4 sidebar">
-        
-        
+                    <aside id="article-toc" role="navigation" class="col-md-4">
     <div class="widget">
-        <h3 class="title">搜索</h3>
-        <div id="search-form">
-            <div id="result-mask" class="hide"></div>
-            <div class="search-area">
-                
-                    <input id="search-key" type="search" autocomplete="off" placeholder="搜点什么呢？">
-                    <button type="button" class="search-form-submit" id="search-local">站内搜索</button>
-                
-                
-            </div>
-            <div id="result-wrap" class="hide">
-                <div id="search-result"></div>
-            </div>
-            <div class="hide">
-                <template id="search-tpl">
-                    <div class="item">
-                        <a href="/{path}" title="{title}">
-                            <div class="title">{title}</div>
-                            <div class="content">{content}</div>
-                        </a>
-                    </div>
-                </template>
-            </div>
-        </div>
-    </div>
-
+        <h3 class="title">文章目录</h3>
         
-        
-    <div class="widget">
-      <h3 class="title">社交</h3> 
-        <div class="content social">
-            
-	            <a href="//github.com/acupt" rel="external nofollow" title="Github" target="_blank">
-			    	<i class="git fa fa-git"></i>
-			    </a>
-            
-	            <a href="mailto:acupjava@163.com" rel="external nofollow" title="邮箱" target="_blank">
-			    	<i class="envelope-o fa fa-envelope-o"></i>
-			    </a>
-            
-        </div>
-    </div>
-
-
-        
-        
-    <div class="widget">
-        <h3 class="title">分类</h3>
-        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/dev/"><i class="fa" aria-hidden="true">dev</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/spring/"><i class="fa" aria-hidden="true">spring</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务/"><i class="fa" aria-hidden="true">微服务</i></a><span class="category-list-count">10</span></li></ul>
-    </div>
-
-
-        
-        
-    <div class="widget">
-        <h3 class="title">归档</h3>
-        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">2</span></li></ul>
-    </div>
-
-
-        
-        
-  <div class="widget">
-    <h3 class="title">标签云</h3>
-    <div class="content tag-cloud">
-        
-            <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/eureka/" style="font-size: 16.67px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/github/" style="font-size: 13.33px;">github</a> <a href="/tags/grpc/" style="font-size: 16.67px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 16.67px;">rpc</a> <a href="/tags/spring/" style="font-size: 10px;">spring</a> <a href="/tags/thrift/" style="font-size: 16.67px;">thrift</a> <a href="/tags/微服务/" style="font-size: 20px;">微服务</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a>
+            <p>暂无目录</p>
         
     </div>
-  </div>
-
-
-        
-    </aside>
+</aside>
 
                 
             </div>
@@ -313,8 +310,6 @@
     </div>
 </div>
 
-
-	<script src="/js/search.js?rev=@@hash"></script>
 
 
 

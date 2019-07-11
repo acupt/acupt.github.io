@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="微服务,thrift" />
+
+
+    <meta name="description" content="
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+thrift是Facebook开源的rpc框架，基于TPC，默认使用二进制。
+需要先掌握thrift的基本用法: th..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>从0.5到1写个rpc框架 - 3:远程服务调用(thrift) | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/article/"><i class="fa "></i>博文</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/code/"><i class="fa "></i>代码</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="从0.5到1写个rpc框架 - 3:远程服务调用(thrift)">
+            
+	            从0.5到1写个rpc框架 - 3:远程服务调用(thrift)
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/微服务/">微服务</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/thrift/">thrift</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2018/11/29</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
+</blockquote>
+<p>thrift是Facebook开源的rpc框架，基于TPC，默认使用二进制。</p>
+<p>需要先掌握thrift的基本用法: <a href="https://my.oschina.net/liujiest/blog/2878958" target="_blank" rel="noopener">thrift-Java 示例</a></p>
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- acuprpc</span><br><span class="line">    + acuprpc-core  //server/client核心处理逻辑</span><br><span class="line">    + acuprpc-protocol-thrift  //基于thrift实现远程调用</span><br><span class="line">    + acuprpc-spring-boot-starter  //server端服务扫描，client端动态代理，服务注册/发现</span><br></pre></td></tr></table></figure>
+<h2 id="thrift-通信"><a href="#thrift-通信" class="headerlink" title="thrift 通信"></a>thrift 通信</h2><h3 id="接口定义"><a href="#接口定义" class="headerlink" title="接口定义"></a>接口定义</h3><p>定义服务提供者（server）和服务调用者（client）交流所用的数据结构，client需要告诉server要调用的类名、方法名以及参数（json格式的字符串，在server端再反序列化）。</p>
+<p>resources/service.thrift</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">namespace java com.acupt.acuprpc.protocol.thrift.proto</span><br><span class="line">service ThriftService&#123;</span><br><span class="line">    <span class="function">InvokeResponse <span class="title">invokeMethod</span><span class="params">(<span class="number">1</span>:InvokeRequest invokeRequest)</span></span></span><br><span class="line"><span class="function">&#125;</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">struct InvokeRequest</span>&#123;</span><br><span class="line"><span class="number">1</span>: required string appName;</span><br><span class="line"><span class="number">2</span>: required string serviceName;</span><br><span class="line"><span class="number">3</span>: required string methodName;</span><br><span class="line"><span class="number">4</span>: required list&lt;string&gt; orderedParameter;</span><br><span class="line"><span class="number">5</span>: required map&lt;string,string&gt; namedParameter;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">struct InvokeResponse&#123;</span><br><span class="line"><span class="number">1</span>: required i32 code;</span><br><span class="line"><span class="number">2</span>: optional string message;</span><br><span class="line"><span class="number">3</span>: optional string result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="thrift-service"><a href="#thrift-service" class="headerlink" title="thrift-service"></a>thrift-service</h3><p>这个类负责接收 thrift-client 发过来的请求，取出请求中的参数，转换成通用的结构，交给core层的RpcServer去执行对应方法，然后将返回值序列化成json返回给 thrift-client。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThriftService</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">acupt</span>.<span class="title">acuprpc</span>.<span class="title">protocol</span>.<span class="title">thrift</span>.<span class="title">proto</span>.<span class="title">ThriftService</span>.<span class="title">Iface</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcServer rpcServer;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ThriftService</span><span class="params">(RpcServer rpcServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcServer = rpcServer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> InvokeResponse <span class="title">invokeMethod</span><span class="params">(InvokeRequest invokeRequest)</span> </span>&#123;</span><br><span class="line">        RpcRequest rpcRequest = <span class="keyword">new</span> RpcRequest(</span><br><span class="line">                invokeRequest.getAppName(),</span><br><span class="line">                invokeRequest.getServiceName(),</span><br><span class="line">                invokeRequest.getMethodName(),</span><br><span class="line">                invokeRequest.getOrderedParameter(),</span><br><span class="line">                invokeRequest.getNamedParameter());</span><br><span class="line">        RpcResponse rpcResponse = rpcServer.execute(rpcRequest);</span><br><span class="line">        InvokeResponse response = <span class="keyword">new</span> InvokeResponse();</span><br><span class="line">        response.setCode(rpcResponse.getCode());</span><br><span class="line">        response.setMessage(rpcResponse.getMessage());</span><br><span class="line">        response.setResult(rpcResponse.getResultString());</span><br><span class="line">        <span class="keyword">return</span> response;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="thrift-server"><a href="#thrift-server" class="headerlink" title="thrift-server"></a>thrift-server</h3><p>作物服务提供者的具体实现类，只需要实现两个方法：启动服务和关闭服务，其他的交给core层的父类即可。</p>
+<p>由于thrift server 调用serve()方法后会阻塞线程，因此需要另外启动一个线程去开启服务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThriftServer</span> <span class="keyword">extends</span> <span class="title">RpcServer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> nThreads = <span class="number">100</span>;</span><br><span class="line">    <span class="keyword">private</span> TServer server;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ThriftServer</span><span class="params">(RpcInstance rpcInstance)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(rpcInstance);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">startRpc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            TProcessor tprocessor = <span class="keyword">new</span> com.acupt.acuprpc.protocol.thrift.proto.ThriftService.</span><br><span class="line">                    Processor&lt;com.acupt.acuprpc.protocol.thrift.proto.ThriftService.Iface&gt;(<span class="keyword">new</span> ThriftService(<span class="keyword">this</span>));</span><br><span class="line">            TServerTransport serverTransport = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                serverTransport = <span class="keyword">new</span> TServerSocket(getRpcInstance().getRpcConf().getPort());</span><br><span class="line">            &#125; <span class="keyword">catch</span> (TTransportException e) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> RpcException(e);</span><br><span class="line">            &#125;</span><br><span class="line">            TThreadPoolServer.Args tArgs = <span class="keyword">new</span> TThreadPoolServer.Args(serverTransport);</span><br><span class="line">            tArgs.processor(tprocessor);</span><br><span class="line">            tArgs.executorService(Executors.newFixedThreadPool(nThreads));</span><br><span class="line">            server = <span class="keyword">new</span> TThreadPoolServer(tArgs);</span><br><span class="line">            server.serve();<span class="comment">//阻塞</span></span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">shutdownRpc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (server != <span class="keyword">null</span>) &#123;</span><br><span class="line">            server.setShouldStop(<span class="keyword">true</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="thrift-client"><a href="#thrift-client" class="headerlink" title="thrift-client"></a>thrift-client</h3><p>作为服务调用者，需要把动态代理类传来的请求信息包装成thrift支持的结构，并调用thrift的请求方法，再把远程服务返回的结果返回给代理类。</p>
+<p>thrift client 是线程不安全的，从它提供的方法就能够看出来。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">send_invokeMethod</span><span class="params">(InvokeRequest invokeRequest)</span></span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> InvokeResponse <span class="title">recv_invokeMethod</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> InvokeResponse <span class="title">invokeMethod</span><span class="params">(InvokeRequest invokeRequest)</span> <span class="keyword">throws</span> org.apache.thrift.TException</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    send_invokeMethod(invokeRequest);</span><br><span class="line">    <span class="keyword">return</span> recv_invokeMethod();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为了简单直接在把方法设为 synchronized ，后续再使用对象池</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThriftClient</span> <span class="keyword">extends</span> <span class="title">RpcClient</span> <span class="keyword">implements</span> <span class="title">RpcCode</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> AtomicReference&lt;ThriftService.Client&gt; clientRef;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ThriftClient</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(nodeInfo);</span><br><span class="line">        clientRef = <span class="keyword">new</span> AtomicReference&lt;&gt;(getClient(nodeInfo));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//todo client线程不安全，使用连接池管理</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@SneakyThrows</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> String <span class="title">remoteInvoke</span><span class="params">(RpcRequest rpcRequest)</span> </span>&#123;</span><br><span class="line">        InvokeRequest request = <span class="keyword">new</span> InvokeRequest();</span><br><span class="line">        request.setAppName(rpcRequest.getAppName());</span><br><span class="line">        request.setServiceName(rpcRequest.getServiceName());</span><br><span class="line">        request.setMethodName(rpcRequest.getMethodName());</span><br><span class="line">        request.setOrderedParameter(rpcRequest.getOrderedParameter());</span><br><span class="line">        InvokeResponse response = clientRef.get().invokeMethod(request);</span><br><span class="line">        <span class="keyword">if</span> (response.getCode() != SUCCESS) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> HttpStatusException(response.getCode(), response.getMessage());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> response.getResult();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> NodeInfo <span class="title">reconnectRpc</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdownRpc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        close(clientRef.get());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ThriftService.<span class="function">Client <span class="title">getClient</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">(ThriftService.Client client)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2018/11/29/acuprpc-0/" class="pre-post btn btn-default" title='从0.5到1写个rpc框架 - 0'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 0</span>
+        </a>
+    
+    
+        <a href="/2018/11/29/acuprpc-4/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 4:request filter'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 4:request filter</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#项目结构"><span class="toc-text">项目结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#thrift-通信"><span class="toc-text">thrift 通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#接口定义"><span class="toc-text">接口定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thrift-service"><span class="toc-text">thrift-service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thrift-server"><span class="toc-text">thrift-server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#thrift-client"><span class="toc-text">thrift-client</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2019
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

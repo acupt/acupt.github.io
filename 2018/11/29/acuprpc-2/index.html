@@ -1,0 +1,338 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="微服务,grpc" />
+
+
+    <meta name="description" content="
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+gRPC是Google开源的跨语言远程服务调用(RPC)框架，通信协议用的HTTP/2，数据传输默认用的protoco..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>从0.5到1写个rpc框架 - 2:远程服务调用(grpc) | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+	<div class="hide">
+		<script type="text/javascript">
+			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+		</script>
+	</div>
+
+
+
+
+
+
+    
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(http://snippet.shenliyang.com/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/article/"><i class="fa "></i>博文</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/code/"><i class="fa "></i>代码</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="从0.5到1写个rpc框架 - 2:远程服务调用(grpc)">
+            
+	            从0.5到1写个rpc框架 - 2:远程服务调用(grpc)
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/微服务/">微服务</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/grpc/">grpc</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2018/11/29</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
+</blockquote>
+<p>gRPC是Google开源的跨语言远程服务调用(RPC)框架，通信协议用的HTTP/2，数据传输默认用的protocol buffers（一种轻便高效的结构化数据存储格式，想比json更小更快，不过没有可读性）。</p>
+<p>需要先掌握grpc的基本用法: <a href="https://acupt.github.io/2018/10/23/grpc-start/">gRPC-Java 示例</a></p>
+<h2 id="项目结构"><a href="#项目结构" class="headerlink" title="项目结构"></a>项目结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- acuprpc</span><br><span class="line">    + acuprpc-core  //server/client核心处理逻辑</span><br><span class="line">    + acuprpc-protocol-grpc  //基于grpc实现远程调用</span><br><span class="line">    + acuprpc-spring-boot-starter  //server端服务扫描，client端动态代理，服务注册/发现</span><br></pre></td></tr></table></figure>
+<h2 id="grpc通信"><a href="#grpc通信" class="headerlink" title="grpc通信"></a>grpc通信</h2><h3 id="接口定义"><a href="#接口定义" class="headerlink" title="接口定义"></a>接口定义</h3><p>定义服务提供者（server）和服务调用者（client）交流所用的数据结构，client需要告诉server要调用的类名、方法名以及参数（json格式的字符串，在server端再反序列化）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">syntax = <span class="string">"proto3"</span>;</span><br><span class="line"></span><br><span class="line">option java_multiple_files = <span class="keyword">true</span>;</span><br><span class="line">option java_package = <span class="string">"com.acupt.acuprpc.protocol.grpc.proto"</span>;</span><br><span class="line">option java_outer_classname = <span class="string">"GrpcServiceProto"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">package</span> com.acupt.acuprpc.protocol.grpc.proto;</span><br><span class="line"></span><br><span class="line">service GrpcService &#123;</span><br><span class="line">    <span class="function">rpc <span class="title">invokeMethod</span> <span class="params">(InvokeRequest)</span> <span class="title">returns</span> <span class="params">(InvokeResponse)</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message InvokeRequest &#123;</span><br><span class="line">    string appName = <span class="number">1</span>;</span><br><span class="line">    string serviceName = <span class="number">2</span>;</span><br><span class="line">    string methodName = <span class="number">3</span>;</span><br><span class="line">    repeated string orderedParameter = <span class="number">4</span>;</span><br><span class="line">    map&lt;string, string&gt; namedParameter = <span class="number">5</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">message InvokeResponse &#123;</span><br><span class="line">    int32 code = <span class="number">1</span>;</span><br><span class="line">    string message = <span class="number">2</span>;</span><br><span class="line">    string result = <span class="number">3</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="grpc-service"><a href="#grpc-service" class="headerlink" title="grpc-service"></a>grpc-service</h3><p>这个类负责接收grpc-client发过来的请求，取出请求中的参数，转换成通用的结构，交给core层的RpcServer去执行对应方法，然后将返回值序列化成json返回给grpc-client。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GrpcService</span> <span class="keyword">extends</span> <span class="title">GrpcServiceGrpc</span>.<span class="title">GrpcServiceImplBase</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> RpcServer rpcServer;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GrpcService</span><span class="params">(RpcServer rpcServer)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcServer = rpcServer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">invokeMethod</span><span class="params">(InvokeRequest request, StreamObserver&lt;InvokeResponse&gt; responseObserver)</span> </span>&#123;</span><br><span class="line">        RpcRequest rpcRequest = <span class="keyword">new</span> RpcRequest(</span><br><span class="line">                request.getAppName(),</span><br><span class="line">                request.getServiceName(),</span><br><span class="line">                request.getMethodName(),</span><br><span class="line">                request.getOrderedParameterList(),</span><br><span class="line">                request.getNamedParameterMap());</span><br><span class="line">        RpcResponse rpcResponse = rpcServer.execute(rpcRequest);</span><br><span class="line">        InvokeResponse response = InvokeResponse.newBuilder()</span><br><span class="line">                .setCode(rpcResponse.getCode())</span><br><span class="line">                .setMessage(rpcResponse.getMessage())</span><br><span class="line">                .setResult(rpcResponse.getResultString())</span><br><span class="line">                .build();</span><br><span class="line">        responseObserver.onNext(response);</span><br><span class="line">        responseObserver.onCompleted();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="grpc-server"><a href="#grpc-server" class="headerlink" title="grpc-server"></a>grpc-server</h3><p>作物服务提供者的具体实现类，只需要实现两个方法：启动服务和关闭服务，其他的交给core层的父类即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GrpcServer</span> <span class="keyword">extends</span> <span class="title">RpcServer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Server server;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GrpcServer</span><span class="params">(RpcInstance rpcInstance)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(rpcInstance);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@SneakyThrows</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">startRpc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        server = ServerBuilder</span><br><span class="line">                .forPort(getRpcInstance().getRpcConf().getPort())</span><br><span class="line">                .addService(<span class="keyword">new</span> GrpcService(<span class="keyword">this</span>))</span><br><span class="line">                .build().start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">shutdownRpc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (server != <span class="keyword">null</span>) &#123;</span><br><span class="line">            server.shutdown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="grpc-client"><a href="#grpc-client" class="headerlink" title="grpc-client"></a>grpc-client</h3><p>作为服务调用者，需要把动态代理类传来的请求信息包装成grpc支持的结构，并调用grpc的请求方法，再把远程服务返回的结果返回给代理类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GrpcClient</span> <span class="keyword">extends</span> <span class="title">RpcClient</span> <span class="keyword">implements</span> <span class="title">RpcCode</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> AtomicReference&lt;GrpcServiceGrpc.GrpcServiceFutureStub&gt; stubRef;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">GrpcClient</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(nodeInfo);</span><br><span class="line">        <span class="keyword">this</span>.stubRef = <span class="keyword">new</span> AtomicReference&lt;&gt;(getStub(nodeInfo));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> String <span class="title">remoteInvoke</span><span class="params">(RpcRequest rpcRequest)</span> </span>&#123;</span><br><span class="line">        InvokeRequest.Builder builder = InvokeRequest.newBuilder()</span><br><span class="line">                .setAppName(rpcRequest.getAppName())</span><br><span class="line">                .setServiceName(rpcRequest.getServiceName())</span><br><span class="line">                .setMethodName(rpcRequest.getMethodName());</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">        ListenableFuture&lt;InvokeResponse&gt; future = stubRef.get().invokeMethod(builder.build());</span><br><span class="line">        InvokeResponse response = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">//...</span></span><br><span class="line">        <span class="keyword">return</span> response.getResult();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@SneakyThrows</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> NodeInfo <span class="title">reconnectRpc</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...使用参数中的ip和端口建立新连接，并断开老的连接，可用于重新负载和异常节点重试</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="meta">@SneakyThrows</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">shutdownRpc</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...主动断开和服务端的连接</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> GrpcServiceGrpc.<span class="function">GrpcServiceFutureStub <span class="title">getStub</span><span class="params">(NodeInfo nodeInfo)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//...和服务端建立连接，使用参数中的ip和端口</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2018/11/29/acuprpc-5/" class="pre-post btn btn-default" title='从0.5到1写个rpc框架 - 5:服务监控和管理(actuator)'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 5:服务监控和管理(actuator)</span>
+        </a>
+    
+    
+        <a href="/2018/11/29/acuprpc-1/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#项目结构"><span class="toc-text">项目结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#grpc通信"><span class="toc-text">grpc通信</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#接口定义"><span class="toc-text">接口定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#grpc-service"><span class="toc-text">grpc-service</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#grpc-server"><span class="toc-text">grpc-server</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#grpc-client"><span class="toc-text">grpc-client</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2019
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
