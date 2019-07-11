@@ -57,12 +57,6 @@ servlet filter 分析在..." />
 
 
     
-	<div class="hide">
-		<script type="text/javascript">
-			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
-		</script>
-	</div>
-
 
 
 
@@ -111,22 +105,6 @@ servlet filter 分析在..." />
                         
                             <li role="presentation" class="text-center">
                                 <a href="/"><i class="fa "></i>HOME</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/article/"><i class="fa "></i>博文</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/code/"><i class="fa "></i>代码</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
                             </li>
                         
                             <li role="presentation" class="text-center">
@@ -213,6 +191,26 @@ servlet filter 分析在..." />
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RpcResponse <span class="title">execute</span><span class="params">(RpcRequest rpcRequest)</span> </span>&#123;</span><br><span class="line">    RpcServiceInfo rpcServiceInfo = <span class="keyword">new</span> RpcServiceInfo(rpcRequest.getAppName(), rpcRequest.getServiceName());</span><br><span class="line">    RpcFilterChain chain = <span class="keyword">new</span> RpcFilterChain(filters, rpcServiceInfo, serviceExecutorMap.get(rpcServiceInfo));</span><br><span class="line">    RpcResponse rpcResponse = <span class="keyword">new</span> RpcResponse();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        chain.doFilter(rpcRequest, rpcResponse);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        rpcResponse.error(e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rpcResponse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
     </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+                <span class="reward-type">
+                    <img class="alipay" src="/img/paycode_alipay.jpg"><b>支付宝打赏</b>
+                </span>
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/paycode_wx.png"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">当我把二维码放上去，我知道我的心里已经没点B数了</p>
+</div>
+
+
     
     <div class="post-footer">
         <div>
@@ -320,7 +318,7 @@ servlet filter 分析在..." />
 
             </div>
             <div class="col-sm-12">
-                <span>Copyright &copy; 2019
+                <span>Copyright &copy; 2018
                 </span> |
                 <span>
                     Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>

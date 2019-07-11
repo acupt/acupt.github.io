@@ -53,12 +53,6 @@
 
 
     
-	<div class="hide">
-		<script type="text/javascript">
-			var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
-		</script>
-	</div>
-
 
 
 
@@ -110,22 +104,6 @@
                             </li>
                         
                             <li role="presentation" class="text-center">
-                                <a href="/categories/article/"><i class="fa "></i>博文</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/note/"><i class="fa "></i>随笔</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/code/"><i class="fa "></i>代码</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
-                                <a href="/categories/tool/"><i class="fa "></i>工具</a>
-                            </li>
-                        
-                            <li role="presentation" class="text-center">
                                 <a href="/archives/"><i class="fa "></i>时间轴</a>
                             </li>
                         
@@ -148,63 +126,6 @@
 
 
 
-
-
-<article class="post">
-    
-    <div class="post-content">
-        <div class="post-head home-post-head">
-            <h1 class="post-title">
-                <a href="/2018/11/29/acuprpc-6/">从0.5到1写个rpc框架 - 6:调用异常节点自动重试</a>
-            </h1>
-            <div class="post-meta">  &bull;
-                <time class="post-date" datetime="" title="">
-                    2018年11月29日
-                </time>
-            </div>
-        </div>
-        <p class="brief">
-            
-                
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
-
-eureka client每隔30s向注册中心发送心跳来给自己续命，因此
-
-            
-        </p>
-    </div>
-    
-        <footer class="post-footer clearfix">
-            <div class="pull-left tag-list">
-                <div class="post-meta">
-    
-        <span class="categories-meta fa-wrap">
-            <i class="fa fa-folder-open-o"></i>
-            <a class="category-link" href="/categories/微服务/">微服务</a>
-        </span>
-    
-
-    
-        <span class="fa-wrap">
-            <i class="fa fa-tags"></i>
-            <span class="tags-meta">
-                
-                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
-                
-            </span>
-        </span>
-    
-
-    
-</div>
-            </div>
-
-            <div class="post-permalink">
-                <a href="/2018/11/29/acuprpc-6/" class="btn btn-default">阅读全文</a>
-            </div>
-        </footer>
-    
-</article>
 
 
 <article class="post">
@@ -257,6 +178,62 @@ eureka client每隔30s向注册中心发送心跳来给自己续命，因此
 
             <div class="post-permalink">
                 <a href="/2018/11/29/acuprpc-0/" class="btn btn-default">阅读全文</a>
+            </div>
+        </footer>
+    
+</article>
+
+
+<article class="post">
+    
+    <div class="post-content">
+        <div class="post-head home-post-head">
+            <h1 class="post-title">
+                <a href="/2018/11/29/acuprpc-1/">从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)</a>
+            </h1>
+            <div class="post-meta">  &bull;
+                <time class="post-date" datetime="" title="">
+                    2018年11月29日
+                </time>
+            </div>
+        </div>
+        <p class="brief">
+            
+                
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+123- acuprpc    + acuprpc-core  //server/client核心处理逻辑    + acuprpc-spring-boot-...
+            
+        </p>
+    </div>
+    
+        <footer class="post-footer clearfix">
+            <div class="pull-left tag-list">
+                <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/微服务/">微服务</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                
+            </span>
+        </span>
+    
+
+    
+</div>
+            </div>
+
+            <div class="post-permalink">
+                <a href="/2018/11/29/acuprpc-1/" class="btn btn-default">阅读全文</a>
             </div>
         </footer>
     
@@ -445,6 +422,63 @@ springboot项目中只要引入spring-boot-starter-actuator就可以得到一些
     <div class="post-content">
         <div class="post-head home-post-head">
             <h1 class="post-title">
+                <a href="/2018/11/29/acuprpc-6/">从0.5到1写个rpc框架 - 6:调用异常节点自动重试</a>
+            </h1>
+            <div class="post-meta">  &bull;
+                <time class="post-date" datetime="" title="">
+                    2018年11月29日
+                </time>
+            </div>
+        </div>
+        <p class="brief">
+            
+                
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+eureka client每隔30s向注册中心发送心跳来给自己续命，因此
+
+            
+        </p>
+    </div>
+    
+        <footer class="post-footer clearfix">
+            <div class="pull-left tag-list">
+                <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/微服务/">微服务</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                
+            </span>
+        </span>
+    
+
+    
+</div>
+            </div>
+
+            <div class="post-permalink">
+                <a href="/2018/11/29/acuprpc-6/" class="btn btn-default">阅读全文</a>
+            </div>
+        </footer>
+    
+</article>
+
+
+<article class="post">
+    
+    <div class="post-content">
+        <div class="post-head home-post-head">
+            <h1 class="post-title">
                 <a href="/2018/11/29/acuprpc-2/">从0.5到1写个rpc框架 - 2:远程服务调用(grpc)</a>
             </h1>
             <div class="post-meta">  &bull;
@@ -490,62 +524,6 @@ gRPC是Google开源的跨语言远程服务调用(RPC)框架，通信协议用�
 
             <div class="post-permalink">
                 <a href="/2018/11/29/acuprpc-2/" class="btn btn-default">阅读全文</a>
-            </div>
-        </footer>
-    
-</article>
-
-
-<article class="post">
-    
-    <div class="post-content">
-        <div class="post-head home-post-head">
-            <h1 class="post-title">
-                <a href="/2018/11/29/acuprpc-1/">从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)</a>
-            </h1>
-            <div class="post-meta">  &bull;
-                <time class="post-date" datetime="" title="">
-                    2018年11月29日
-                </time>
-            </div>
-        </div>
-        <p class="brief">
-            
-                
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
-
-123- acuprpc    + acuprpc-core  //server/client核心处理逻辑    + acuprpc-spring-boot-...
-            
-        </p>
-    </div>
-    
-        <footer class="post-footer clearfix">
-            <div class="pull-left tag-list">
-                <div class="post-meta">
-    
-        <span class="categories-meta fa-wrap">
-            <i class="fa fa-folder-open-o"></i>
-            <a class="category-link" href="/categories/微服务/">微服务</a>
-        </span>
-    
-
-    
-        <span class="fa-wrap">
-            <i class="fa fa-tags"></i>
-            <span class="tags-meta">
-                
-                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
-                
-            </span>
-        </span>
-    
-
-    
-</div>
-            </div>
-
-            <div class="post-permalink">
-                <a href="/2018/11/29/acuprpc-1/" class="btn btn-default">阅读全文</a>
             </div>
         </footer>
     
@@ -784,6 +762,10 @@ thrift –version
 			    	<i class="envelope-o fa fa-envelope-o"></i>
 			    </a>
             
+	            <a href="/img/qrcode_wx_12cm.jpg" rel="external nofollow" title="微信" target="_blank">
+			    	<i class="weixin fa fa-weixin"></i>
+			    </a>
+            
         </div>
     </div>
 
@@ -857,7 +839,7 @@ thrift –version
 
             </div>
             <div class="col-sm-12">
-                <span>Copyright &copy; 2019
+                <span>Copyright &copy; 2018
                 </span> |
                 <span>
                     Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
