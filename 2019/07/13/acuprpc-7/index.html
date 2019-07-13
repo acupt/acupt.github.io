@@ -24,8 +24,7 @@
     <meta name="description" content="
 这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
 
-eureka client每隔30s向注册中心发送心跳来给自己续命，因此
-" />
+微服务除了在内部相互调用，有时某些服务也会提供给外部应用。当然不能让外部应用也加入到“大家庭”里，毕竟知人知面不知源码..." />
 
 
 
@@ -37,7 +36,7 @@ eureka client每隔30s向注册中心发送心跳来给自己续命，因此
     <!--Title-->
 
 
-<title>从0.5到1写个rpc框架 - 6:调用异常节点自动重试 | 一杯82年的JAVA</title>
+<title>从0.5到1写个rpc框架 - 7:网关支持(gateway) | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -132,9 +131,9 @@ eureka client每隔30s向注册中心发送心跳来给自己续命，因此
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="从0.5到1写个rpc框架 - 6:调用异常节点自动重试">
+        <h1 id="从0.5到1写个rpc框架 - 7:网关支持(gateway)">
             
-	            从0.5到1写个rpc框架 - 6:调用异常节点自动重试
+	            从0.5到1写个rpc框架 - 7:网关支持(gateway)
             
         </h1>
         <div class="post-meta">
@@ -160,7 +159,7 @@ eureka client每隔30s向注册中心发送心跳来给自己续命，因此
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2018/11/29</span>
+            <span class="date-meta">2019/07/13</span>
         </span>
         
             <span class="fa-wrap">
@@ -178,7 +177,20 @@ eureka client每隔30s向注册中心发送心跳来给自己续命，因此
         <blockquote>
 <p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
 </blockquote>
-<p>eureka client每隔30s向注册中心发送心跳来给自己续命，因此</p>
+<p>微服务除了在内部相互调用，有时某些服务也会提供给外部应用。当然不能让外部应用也加入到“大家庭”里，毕竟知人知面不知源码，我们可以派出一个“前台”去接待它们，这就是“网关”。</p>
+<p><img src="/img/micro-service/gateway.png" alt="gateway"></p>
+<p>网关负责对接外部来宾，因此要做好安全措施，什么登陆、权限该上就上。</p>
+<p>流程如下：</p>
+<ul>
+<li>网关收到请求</li>
+<li>解析请求（服务名，方法，参数等）</li>
+<li>选择一个实例（来自注册中心）</li>
+<li>RPC调用</li>
+<li>结果返回给请求方</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/api"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApiController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 动态调用rpc服务的关键，在acuprpc-spring-boot-starter中已经生成，可以随时引用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> RpcClientManager rpcClientManager;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ApiController</span><span class="params">(RpcClientManager rpcClientManager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcClientManager = rpcClientManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(method = RequestMethod.POST, produces = <span class="string">"application/json"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(@RequestBody RpcRequestDTO requestDTO)</span> </span>&#123;</span><br><span class="line">        RpcServiceInfo serviceInfo = <span class="keyword">new</span> RpcServiceInfo(requestDTO.getApp(), requestDTO.getService());</span><br><span class="line">        RpcClient client = rpcClientManager.lookup(serviceInfo);<span class="comment">//获取一个可以提供所需服务的连接</span></span><br><span class="line">        RpcRequest request = <span class="keyword">new</span> RpcRequest(requestDTO.getApp(), requestDTO.getService(), requestDTO.getMethod());</span><br><span class="line">        <span class="keyword">if</span> (requestDTO.getParameters() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">            requestDTO.getParameters().forEach((k, v) -&gt; map.put(k, JsonUtil.toJson(v)));</span><br><span class="line">            request.setNamedParameter(map);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> client.invoke(request);<span class="comment">//调用服务获得返回的json字符串</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个demo作为一个子模块（acuprpc-spring-boot-starter-gateway）加入了框架的全家桶，直接引入依赖就能使用这个功能。</p>
+<p>基于这个方法，可以实现更加复杂的也无需求，这里就不细讲了，本系列结束。</p>
 
     </div>
     
@@ -217,9 +229,9 @@ eureka client每隔30s向注册中心发送心跳来给自己续命，因此
 <div class="article-nav prev-next-wrap clearfix">
     
     
-        <a href="/2018/11/29/acuprpc-5/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 5:服务监控和管理(actuator)'>
+        <a href="/2019/07/13/acuprpc-6/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 6:调用异常节点自动重试'>
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">从0.5到1写个rpc框架 - 5:服务监控和管理(actuator)</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 6:调用异常节点自动重试</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
