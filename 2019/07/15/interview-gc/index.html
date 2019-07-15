@@ -18,13 +18,13 @@
     <link rel="dns-prefetch" href="https://acupt.github.io">
     <!--SEO-->
 
-    <meta name="keywords" content="微服务,rpc,grpc,thrift,eureka" />
+    <meta name="keywords" content="jvm,gc" />
 
 
     <meta name="description" content="
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+作为一个落魄的java开发，在面试中常被问道：你是什么垃圾？哦不，是你对java的垃圾回收机制有了解吗？
 
-最近在新公司开始接触微服务，在此之前并没有微服务的开发经验。对比了spring cloud和公司的rpc框架，对微服务..." />
+接下来就对GC做一个全方位的总结，下次可以自信的回答面试官：我是可以被贵公司回收的那..." />
 
 
 
@@ -36,7 +36,7 @@
     <!--Title-->
 
 
-<title>从0.5到1写个rpc框架 - 0:前言 | 一杯82年的JAVA</title>
+<title>面试杂谈 - 谈谈你对GC的理解 | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -135,16 +135,16 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="从0.5到1写个rpc框架 - 0:前言">
+        <h1 id="面试杂谈 - 谈谈你对GC的理解">
             
-	            从0.5到1写个rpc框架 - 0:前言
+	            面试杂谈 - 谈谈你对GC的理解
             
         </h1>
         <div class="post-meta">
     
         <span class="categories-meta fa-wrap">
             <i class="fa fa-folder-open-o"></i>
-            <a class="category-link" href="/categories/微服务/">微服务</a>
+            <a class="category-link" href="/categories/面试杂谈/">面试杂谈</a>
         </span>
     
 
@@ -153,7 +153,7 @@
             <i class="fa fa-tags"></i>
             <span class="tags-meta">
                 
-                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/grpc/">grpc</a> <a class="tag-link" href="/tags/rpc/">rpc</a> <a class="tag-link" href="/tags/thrift/">thrift</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                    <a class="tag-link" href="/tags/gc/">gc</a> <a class="tag-link" href="/tags/jvm/">jvm</a>
                 
             </span>
         </span>
@@ -163,7 +163,7 @@
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2018/11/29</span>
+            <span class="date-meta">2019/07/15</span>
         </span>
         
             <span class="fa-wrap">
@@ -179,31 +179,47 @@
     
     <div class="post-body post-content">
         <blockquote>
-<p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
+<p>作为一个落魄的java开发，在面试中常被问道：你是什么垃圾？<br>哦不，是你对java的垃圾回收机制有了解吗？</p>
 </blockquote>
-<p>最近在新公司开始接触微服务，在此之前并没有微服务的开发经验。对比了spring cloud和公司的rpc框架，对微服务这套东西终于有了一点粗浅的认知，为了加深理解，自己动手写个rpc框架玩玩。顺便记录下来，不然玩过的东西过段时间就忘了。</p>
-<p>我的spring cloud的入门读物: <a href="https://blog.csdn.net/forezp/article/details/70148833/" target="_blank" rel="noopener">史上最简单的 SpringCloud 教程</a></p>
-<p>我的学习成果: <a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
-<h3 id="设计方案"><a href="#设计方案" class="headerlink" title="设计方案"></a>设计方案</h3><p>总的来说就是在现有工具上的二次开发。</p>
-<ul>
-<li><p>服务注册/发现: eureka</p>
-<p>  这个模块spring cloud已经集成的非常易用了，实在没兴趣再整些骚操作，引入spring-cloud-starter-eureka-server依赖，启动类加个注解@EnableEurekaServer就是一个注册中心了。</p>
-</li>
-<li><p>远程服务调用: grpc/thrift</p>
-<p>  grpc是Google开源的rpc框架，thrift是Facebook开源的rpc框架，而且他们都支持跨语言，都是很厉害的东西，需要用它们的规则定义数据结构，每个服务都定义一次是挺累的，如果只定义一个通用的服务，然后在这个服务里面通过Java反射去执行对应方法就可以少很多工作量了（把工作量变成了Java代码编写）。</p>
-<p>  至于选择这两种，因为都想试试，所以最终设计rpc框架是可以切换通信方式的，把这部分抽出来做成可扩展的即可。</p>
-</li>
+<p>接下来就对GC做一个全方位的总结，下次可以自信的回答面试官：我是可以被贵公司回收的那种。</p>
+<h2 id="GC的时机"><a href="#GC的时机" class="headerlink" title="GC的时机"></a>GC的时机</h2><p>首先，根据内存区域不同，JVM工作模式不同，GC也有一些差别。</p>
+<h3 id="新生代（minor-GC-young-GC）"><a href="#新生代（minor-GC-young-GC）" class="headerlink" title="新生代（minor GC/young GC）"></a>新生代（minor GC/young GC）</h3><blockquote>
+<p>PS: 新生代的内存空间可分为3个，Eden区(产生新生命的伊甸园)，from区和to区（GC时倒腾对象用的两个盘子）</p>
+</blockquote>
+<p>当JVM无法为一个新的对象分配空间时会触发 Minor GC，比如当 Eden 区满了。所以如果程序疯狂造对象，就会频繁触发GC。</p>
+<h3 id="老年代-永久代（major-GC）-整个堆（full-GC）"><a href="#老年代-永久代（major-GC）-整个堆（full-GC）" class="headerlink" title="老年代/永久代（major GC）/整个堆（full GC）"></a>老年代/永久代（major GC）/整个堆（full GC）</h3><blockquote>
+<p>当一个对象经历了太多GC而不死，它会突破旧规则的束缚，飞升到老年代/永久代，成为新的存在，但并不代表着它可以不死，没有谁可以不死，尤其是新的地方也缺少资源的时候。而Major GC通常是跟full GC是等价的，收集整个GC堆。</p>
+</blockquote>
+<p>升到永久代的对象大于永久代剩余空间full gc，或者小于时被HandlePromotionFailure参数强制full gc。</p>
+<h3 id="其它GC时机："><a href="#其它GC时机：" class="headerlink" title="其它GC时机："></a>其它GC时机：</h3><ul>
+<li>在程序中调用System.gc()函数，建议JVM做GC（注意只是建议，JVM有权无视程序猿的建议）</li>
+<li>调参控制进入老年代/永久代的年龄（如果我记得肯定会写出来的，没搜，懒得搜）</li>
+<li>OOM之前（在放弃治疗抛出异常前总要做最后的努力吧）</li>
 </ul>
-<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><p>// 只要列出来，总有一天会写完。</p>
+<h2 id="GC的目标-不使用的对象"><a href="#GC的目标-不使用的对象" class="headerlink" title="GC的目标 - 不使用的对象"></a>GC的目标 - 不使用的对象</h2><blockquote>
+<p>当然是不使用的对象，还在使用的对象给回收了谁知道程序会跑成什么样子</p>
+</blockquote>
+<p>那么什么是不使用的对象呢？</p>
+<h3 id="超出作用域的对象-引用计数为空"><a href="#超出作用域的对象-引用计数为空" class="headerlink" title="超出作用域的对象/引用计数为空"></a>超出作用域的对象/引用计数为空</h3><blockquote>
+<p>引用计数法: 有人引用+1，被人抛弃-1。</p>
+</blockquote>
 <ul>
-<li><a href="/2018/11/29/acuprpc-1/">从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)</a></li>
-<li><a href="/2018/11/29/acuprpc-2/">从0.5到1写个rpc框架 - 2:远程服务调用(grpc)</a></li>
-<li><a href="/2018/11/29/acuprpc-3/">从0.5到1写个rpc框架 - 3:远程服务调用(thrift)</a></li>
-<li><a href="/2018/11/29/acuprpc-4/">从0.5到1写个rpc框架 - 4:request filter</a></li>
-<li><a href="/2018/11/29/acuprpc-5/">从0.5到1写个rpc框架 - 5:服务监控和管理(actuator)</a></li>
-<li><a href="/2019/07/13/acuprpc-6">从0.5到1写个rpc框架 - 6:调用异常节点自动重试</a></li>
-<li><a href="/2019/07/13/acuprpc-7">从0.5到1写个rpc框架 - 7:网关支持(gateway)</a></li>
+<li>优点：一旦没有引用即可释放内存，不需要等待特定时机，回收的时机也比较平均。</li>
+<li>缺点：维护计数消耗资源（但问题不大），循环引用（大）</li>
 </ul>
+<h3 id="可达性分析，有gc-root无法到达的对象"><a href="#可达性分析，有gc-root无法到达的对象" class="headerlink" title="可达性分析，有gc root无法到达的对象"></a>可达性分析，有gc root无法到达的对象</h3><blockquote>
+<p>通过一系列称为”GC Roots”的对象作为起始点，从这些节点开始向下搜索，无法到达的对象就是没用的。<br>可以被当做root的对象，如：线程对象、本地变量、全局变量等。</p>
+</blockquote>
+<p>这里又引入了引用的概念，强度从强到弱依次如下：</p>
+<ul>
+<li>强引用：最常见的如 Object a = new Object()，即使OOM也不回收</li>
+<li>软引用（SoftReference）：内存不够时回收</li>
+<li>弱引用（WeakReference）：正常gc，被扫描到就回收</li>
+<li>幻想引用（PhantomReference）：不可以获取/复活对象, 在垃圾回收时得到通知</li>
+</ul>
+<h2 id="GC的行为"><a href="#GC的行为" class="headerlink" title="GC的行为"></a>GC的行为</h2><p>简单的说就是删除对象，回收空间。根据算法不同，具体的行为也有所不同，快没电了，就不写了（主要也没准备）</p>
+<p>举个栗子：</p>
+<p>1、停止其他线程，标记对象<br>2、清理对象<br>2.1、新生代-复制清理：<br>    Eden和from的存活对象复制到to，然后from和to交换，存活对象年龄+1，年龄到达阈值进入老年代/永久代<br>2.2、老年代-标记清理/整理：<br>    标记清理速度快，但有内存碎片<br>    标记整理会移动存活对象，排除内存碎片</p>
 
     </div>
     
@@ -237,15 +253,10 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2018/11/29/acuprpc-1/" class="pre-post btn btn-default" title='从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)'>
-            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs">从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)</span>
-        </a>
     
-    
-        <a href="/2018/11/20/thrift-start/" class="next-post btn btn-default" title='thrift-Java 示例'>
+        <a href="/2019/07/13/acuprpc-7/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 7:网关支持(gateway)'>
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">thrift-Java 示例</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">从0.5到1写个rpc框架 - 7:网关支持(gateway)</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
@@ -286,7 +297,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#设计方案"><span class="toc-text">设计方案</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#目录"><span class="toc-text">目录</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#GC的时机"><span class="toc-text">GC的时机</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#新生代（minor-GC-young-GC）"><span class="toc-text">新生代（minor GC/young GC）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#老年代-永久代（major-GC）-整个堆（full-GC）"><span class="toc-text">老年代/永久代（major GC）/整个堆（full GC）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其它GC时机："><span class="toc-text">其它GC时机：</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GC的目标-不使用的对象"><span class="toc-text">GC的目标 - 不使用的对象</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#超出作用域的对象-引用计数为空"><span class="toc-text">超出作用域的对象/引用计数为空</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#可达性分析，有gc-root无法到达的对象"><span class="toc-text">可达性分析，有gc root无法到达的对象</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GC的行为"><span class="toc-text">GC的行为</span></a></li></ol>
         
     </div>
 </aside>
