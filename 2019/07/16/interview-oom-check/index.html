@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="jvm,oom" />
+
+
+    <meta name="description" content="
+JAVA的垃圾回收机制给了程序猿便利，我们可以不需要显式释放资源。但想高枕无忧却是不能，OOM像个隐藏在暗处的幽(hua)灵(nong)，威胁着可怜、弱小又漂亮的程序猿。
+
+一般来说，一个健康..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>内存泄漏如何排查 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/教程/"><i class="fa "></i>教程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="内存泄漏如何排查">
+            
+	            内存泄漏如何排查
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/面试杂谈/">面试杂谈</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/jvm/">jvm</a> <a class="tag-link" href="/tags/oom/">oom</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/07/16</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>JAVA的垃圾回收机制给了程序猿便利，我们可以不需要显式释放资源。但想高枕无忧却是不能，OOM像个隐藏在暗处的幽(hua)灵(nong)，威胁着可怜、弱小又漂亮的程序猿。</p>
+</blockquote>
+<p>一般来说，一个健康的程序，它是不应该出现OOM的。内存里的对象从生到死，井然有序。但由于一些人为的失误，往往会让一些对象逃过GC的制裁，跳出GC外，不在垃圾中。这个时候，内存泄漏就发生了。</p>
+<p>内存泄露，是指程序在申请内存并且用完这块内存后（对象不再需要了），没有释放已申请的内存空间。少数偶然的内存泄漏，虽然不太好，但问题不大，我们也不至于对那点内存抠抠搜搜的。但如果是内存不断泄漏，直到新的对象没有足够的空间生成，就会导致OOM。</p>
+<h2 id="什么时候可能内存泄漏"><a href="#什么时候可能内存泄漏" class="headerlink" title="什么时候可能内存泄漏"></a>什么时候可能内存泄漏</h2><h3 id="抛出OOM异常"><a href="#抛出OOM异常" class="headerlink" title="抛出OOM异常"></a>抛出OOM异常</h3><p>当程序抛出OutOfMemoryError，如果你自认不是太抠，给了这个程序足够的空间，那么可以怀疑有内存泄漏</p>
+<h3 id="内存持续上升"><a href="#内存持续上升" class="headerlink" title="内存持续上升"></a>内存持续上升</h3><p>一个健康的程序应该有平稳的新陈代谢，内存占用应该维持在一定范围。但如果内存持续飙升，甚至到达了一个危险的值，那么可以怀疑有内存泄漏。</p>
+<h2 id="查看GC情况"><a href="#查看GC情况" class="headerlink" title="查看GC情况"></a>查看GC情况</h2><p>首先获取到应用的pid，可以使用java的jps命令，或者ps -ef|grep 应用名关键词</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 启动个应用，持续造对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AcuptMain</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        List&lt;Liangzai&gt; liangzais = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            liangzais.add(<span class="keyword">new</span> Liangzai());</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Liangzai</span> </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] body = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">1024</span> * <span class="number">1024</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 执行命令jps查看java进程</span></span><br><span class="line">➜  ~ jps</span><br><span class="line"><span class="number">11617</span> Launcher</span><br><span class="line"><span class="number">11618</span> AcuptMain</span><br><span class="line"><span class="number">1353</span> RemoteMavenServer</span><br><span class="line"><span class="number">1322</span> </span><br><span class="line"><span class="number">11627</span> Jps</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 根据关键词查看，进程id为 11618 ，和jps查到的一致</span></span><br><span class="line">➜  ~ ps -ef|grep acupt</span><br><span class="line">  <span class="number">501</span> <span class="number">11618</span>  <span class="number">1322</span>   <span class="number">0</span> <span class="number">10</span>:<span class="number">44</span>下午 ??         <span class="number">0</span>:<span class="number">00.39</span> /Library/Java/JavaVirtualMachines...</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"># 查看gc总体情况，各个区的使用率变化，3秒更新一次</span><br><span class="line">➜  ~ jstat -gcutil <span class="number">11618</span> <span class="number">3000</span> </span><br><span class="line">  S0     S1     E      O      M     CCS    YGC     YGCT    FGC    FGCT     GCT   </span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">56.20</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">60.89</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">65.58</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">70.26</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">74.95</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">79.64</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">84.33</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">89.01</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">93.70</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>   <span class="number">0.00</span>  <span class="number">98.39</span>   <span class="number">0.00</span>  <span class="number">17.39</span>  <span class="number">19.90</span>      <span class="number">0</span>    <span class="number">0.000</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.000</span></span><br><span class="line">  <span class="number">0.00</span>  <span class="number">98.48</span>   <span class="number">5.02</span>  <span class="number">26.91</span>  <span class="number">79.14</span>  <span class="number">82.73</span>      <span class="number">1</span>    <span class="number">0.021</span>     <span class="number">0</span>    <span class="number">0.000</span>    <span class="number">0.021</span></span><br><span class="line">  (以下略...)</span><br></pre></td></tr></table></figure>
+<p>可以看到Eden(E)持续造对象，并且满了之后，老年代(O)增加，E区腾空后继续造对象。（程序多执行一段时间，或者造对象速度提快点，最终会抛出OOM）</p>
+<h2 id="查看存活对象"><a href="#查看存活对象" class="headerlink" title="查看存活对象"></a>查看存活对象</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 查看存活对象，可以看到排名第一的是byte数组，而且多观察会会发现其数量也是一直在增加</span></span><br><span class="line">➜  ~ jmap -histo:live <span class="number">11618</span></span><br><span class="line"></span><br><span class="line"> num     #instances         #bytes  class name</span><br><span class="line">----------------------------------------------</span><br><span class="line">   <span class="number">1</span>:           <span class="number">644</span>      <span class="number">103949616</span>  [B</span><br><span class="line">   <span class="number">2</span>:          <span class="number">4342</span>         <span class="number">416736</span>  [C</span><br><span class="line">   <span class="number">3</span>:          <span class="number">4326</span>         <span class="number">103824</span>  java.lang.String</span><br><span class="line">   <span class="number">4</span>:           <span class="number">721</span>          <span class="number">82056</span>  java.lang.Class</span><br><span class="line">   <span class="number">5</span>:           <span class="number">746</span>          <span class="number">49224</span>  [Ljava.lang.Object;</span><br><span class="line">   <span class="number">6</span>:           <span class="number">738</span>          <span class="number">29520</span>  java.util.LinkedHashMap$Entry</span><br><span class="line">   <span class="number">7</span>:           <span class="number">609</span>          <span class="number">19488</span>  java.util.HashMap$Node</span><br><span class="line">   <span class="number">8</span>:           <span class="number">303</span>          <span class="number">19392</span>  java.net.URL</span><br><span class="line">   <span class="number">9</span>:           <span class="number">303</span>          <span class="number">13560</span>  [Ljava.lang.String;</span><br></pre></td></tr></table></figure>
+<p>根据存活对象的不正常增长情况，分析程序中哪些地方用到了这种对象，也可以大致推断出可能的内存泄漏处。</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，岂不美哉</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/15/interview-gc/" class="next-post btn btn-default" title='JAVA GC 简析'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">JAVA GC 简析</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么时候可能内存泄漏"><span class="toc-text">什么时候可能内存泄漏</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#抛出OOM异常"><span class="toc-text">抛出OOM异常</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#内存持续上升"><span class="toc-text">内存持续上升</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查看GC情况"><span class="toc-text">查看GC情况</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#查看存活对象"><span class="toc-text">查看存活对象</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

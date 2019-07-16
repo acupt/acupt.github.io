@@ -33,7 +33,7 @@
     <!--Title-->
 
 
-<title>标签: grpc | 一杯82年的JAVA</title>
+<title>标签: oom | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -133,7 +133,7 @@
     
     
         <li>
-            grpc
+            oom
         </li>
     
     
@@ -146,67 +146,20 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
-                    <a href="/2018/11/29/acuprpc-2/">从0.5到1写个rpc框架 - 2:远程服务调用(grpc)</a>
+                    <a href="/2019/07/16/interview-oom-check/">内存泄漏如何排查</a>
                 </h1>
                 <div class="post-meta">  &bull;
                     <time class="post-date" datetime="" title="">
-                        2018年11月29日
+                        2019年07月16日
                     </time>
                 </div>
             </div>
             <p class="brief">
                 
                     
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+JAVA的垃圾回收机制给了程序猿便利，我们可以不需要显式释放资源。但想高枕无忧却是不能，OOM像个隐藏在暗处的幽(hua)灵(nong)，威胁着可怜、弱小又漂亮的程序猿。
 
-gRPC是Google开源的跨语言远程服务调用(RPC)框架，通信协议用的HTTP/2，数据传输默认用的protocol buffers（一种轻便高效的结构化...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2018/11/29/acuprpc-0/">从0.5到1写个rpc框架 - 0:前言</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2018年11月29日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
-
-最近在新公司开始接触微服务，在此之前并没有微服务的开发经验。对比了spring cloud和公司的rpc框架，对微服务这套东西终于有了一点粗浅的认知，为了加深...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2018/10/23/grpc-start/">gRPC-Java 示例</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2018年10月23日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-新建maven项目pom.xml
-12345678910111213141516171819202122232425262728293031323334353637383940&amp;lt;dependencies&amp;gt;        ...
+一般来说，一个健康的程序，它是不应该出现OOM的。内存里的...
                 
             </p>
         </div>
