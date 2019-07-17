@@ -33,7 +33,7 @@
     <!--Title-->
 
 
-<title>标签: thrift | 一杯82年的JAVA</title>
+<title>标签: cpu | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -133,7 +133,7 @@
     
     
         <li>
-            thrift
+            cpu
         </li>
     
     
@@ -146,76 +146,21 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
-                    <a href="/2018/11/29/acuprpc-3/">从0.5到1写个rpc框架 - 3:远程服务调用(thrift)</a>
+                    <a href="/2019/07/17/interview-cup-thread/">CPU占用高如何排查</a>
                 </h1>
                 <div class="post-meta">  &bull;
                     <time class="post-date" datetime="" title="">
-                        2018年11月29日
+                        2019年07月17日
                     </time>
                 </div>
             </div>
             <p class="brief">
                 
                     
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+程序里少不了运算，如果不是环境太恶劣，CPU基本是能支撑应用运行的。但如果发现CPU居高不下，就需要思考是否程序有问题。
 
-thrift是Facebook开源的rpc框架，基于TPC，默认使用二进制。
-需要先掌握thrift的基本用法: thrift-Java 示例
-项目结构123...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2018/11/29/acuprpc-0/">从0.5到1写个rpc框架 - 0:前言</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2018年11月29日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
-
-最近在新公司开始接触微服务，在此之前并没有微服务的开发经验。对比了spring cloud和公司的rpc框架，对微服务这套东西终于有了一点粗浅的认知，为了加深...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2018/11/20/thrift-start/">thrift-Java 示例</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2018年11月20日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    安装thriftmac
-
-brew install thrift
-
-安装完成检查
-
-thrift –version
-
-新建maven项目pom.xml
-12345678910111213141516171819202122232425...
+当服务器CPU居高不下，可以从下面几个方面入手定位问题。
+找到JAVA进程 pid方法一: jps那个jar...
                 
             </p>
         </div>

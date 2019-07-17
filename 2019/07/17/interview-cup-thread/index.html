@@ -1,0 +1,345 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="cpu" />
+
+
+    <meta name="description" content="
+程序里少不了运算，如果不是环境太恶劣，CPU基本是能支撑应用运行的。但如果发现CPU居高不下，就需要思考是否程序有问题。
+
+当服务器CPU居高不下，可以从下面几个方面入手定位问题。
+找到JAV..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>CPU占用高如何排查 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/教程/"><i class="fa "></i>教程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="CPU占用高如何排查">
+            
+	            CPU占用高如何排查
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/面试杂谈/">面试杂谈</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/cpu/">cpu</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/07/17</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>程序里少不了运算，如果不是环境太恶劣，CPU基本是能支撑应用运行的。但如果发现CPU居高不下，就需要思考是否程序有问题。</p>
+</blockquote>
+<p>当服务器CPU居高不下，可以从下面几个方面入手定位问题。</p>
+<h2 id="找到JAVA进程-pid"><a href="#找到JAVA进程-pid" class="headerlink" title="找到JAVA进程 pid"></a>找到JAVA进程 pid</h2><h3 id="方法一-jps"><a href="#方法一-jps" class="headerlink" title="方法一: jps"></a>方法一: jps</h3><p>那个jar就是我的一个java程序</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@iZba13i1mo82ot7a3lhq5oZ ~]# jps</span><br><span class="line"><span class="number">17616</span> Jps</span><br><span class="line"><span class="number">26016</span> jar</span><br><span class="line"><span class="number">9353</span> Bootstrap</span><br><span class="line"><span class="number">26028</span> Bootstrap</span><br><span class="line"><span class="number">16812</span> Bootstrap</span><br></pre></td></tr></table></figure>
+<h3 id="方法二-ps-ef-grep-应用关键词"><a href="#方法二-ps-ef-grep-应用关键词" class="headerlink" title="方法二: ps -ef|grep 应用关键词"></a>方法二: ps -ef|grep 应用关键词</h3><p>和方法一找到的pid是相同的，26016</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@iZba13i1mo82ot7a3lhq5oZ ~]# ps -ef|grep acupjava</span><br><span class="line">root     <span class="number">17638</span> <span class="number">17550</span>  <span class="number">0</span> <span class="number">22</span>:<span class="number">34</span> pts/<span class="number">0</span>    <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> grep --color=auto acupjava</span><br><span class="line">root     <span class="number">26016</span>     <span class="number">1</span>  <span class="number">0</span> <span class="number">7</span>月<span class="number">08</span> ?       <span class="number">00</span>:<span class="number">05</span>:<span class="number">11</span> java -jar acupjava-<span class="number">1.0</span>-SNAPSHOT.jar</span><br></pre></td></tr></table></figure>
+<h2 id="找到进程中CPU高的线程-tid"><a href="#找到进程中CPU高的线程-tid" class="headerlink" title="找到进程中CPU高的线程 tid"></a>找到进程中CPU高的线程 tid</h2><p>打印出线程线程基本信息，找到cpu百分比高的一个或几个线程，记住它们的tid。</p>
+<p>PS：栗子质量不好，全是0.0%，不要在意~</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@iZba13i1mo82ot7a3lhq5oZ ~]# ps -mp 26016 -o THREAD,tid,time</span><br><span class="line">USER     %CPU PRI SCNT WCHAN  USER SYSTEM   TID     TIME</span><br><span class="line">root      <span class="number">0.0</span>   -    - -         -      -     - <span class="number">00</span>:<span class="number">05</span>:<span class="number">11</span></span><br><span class="line">root      <span class="number">0.0</span>  <span class="number">19</span>    - futex_    -      - <span class="number">26016</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br><span class="line">root      <span class="number">0.0</span>  <span class="number">19</span>    - futex_    -      - <span class="number">26017</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">02</span></span><br><span class="line">root      <span class="number">0.0</span>  <span class="number">19</span>    - futex_    -      - <span class="number">26018</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br><span class="line">root      <span class="number">0.0</span>  <span class="number">19</span>    - futex_    -      - <span class="number">26019</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span></span><br><span class="line">root      <span class="number">0.0</span>  <span class="number">19</span>    - futex_    -      - <span class="number">26020</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">11</span></span><br><span class="line">(略...)</span><br></pre></td></tr></table></figure>
+<h2 id="打印线程栈"><a href="#打印线程栈" class="headerlink" title="打印线程栈"></a>打印线程栈</h2><p>选择一个线程，把tid从10进制转为16进制</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@iZba13i1mo82ot7a3lhq5oZ ~]# printf "%x\n" 26017</span><br><span class="line"><span class="number">65</span>a1</span><br></pre></td></tr></table></figure>
+<p>为了方便查看可以把线程栈打印到文件里，jstack pid &gt;&gt; 文件名</p>
+<p>使用ls查看文件已经存在</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@iZba13i1mo82ot7a3lhq5oZ ~]# jstack 26016 &gt;&gt; stack.txt</span><br><span class="line">[root@iZba13i1mo82ot7a3lhq5oZ ~]# ls</span><br><span class="line">test  stack.txt</span><br></pre></td></tr></table></figure>
+<h2 id="找到占用CPU高的线程"><a href="#找到占用CPU高的线程" class="headerlink" title="找到占用CPU高的线程"></a>找到占用CPU高的线程</h2><p>打开文件，搜索tid所在位置，可以看到线程栈，由此分析定位可能有问题的代码。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">"http-nio-9527-AsyncTimeout" #29 daemon prio=5 os_prio=0 tid=0x00007fbf68973800 nid=0x65a1 waiting on condition [0x00007fbf48ab0000]</span><br><span class="line">   java.lang.Thread.State: TIMED_WAITING (sleeping)</span><br><span class="line">        at java.lang.Thread.sleep(Native Method)</span><br><span class="line">        at org.apache.coyote.AbstractProtocol$AsyncTimeout.run(AbstractProtocol.java:<span class="number">1200</span>)</span><br><span class="line">        at java.lang.Thread.run(Thread.java:<span class="number">748</span>)</span><br></pre></td></tr></table></figure>
+<p>如此这般，CPU高的问题基本就能定位出来了。（PS: 以上数据做了些许脱敏处理）</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，岂不美哉</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/16/interview-oom-check/" class="next-post btn btn-default" title='内存泄漏如何排查'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">内存泄漏如何排查</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#找到JAVA进程-pid"><span class="toc-text">找到JAVA进程 pid</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#方法一-jps"><span class="toc-text">方法一: jps</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方法二-ps-ef-grep-应用关键词"><span class="toc-text">方法二: ps -ef|grep 应用关键词</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#找到进程中CPU高的线程-tid"><span class="toc-text">找到进程中CPU高的线程 tid</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#打印线程栈"><span class="toc-text">打印线程栈</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#找到占用CPU高的线程"><span class="toc-text">找到占用CPU高的线程</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
