@@ -18,13 +18,11 @@
     <link rel="dns-prefetch" href="https://acupt.github.io">
     <!--SEO-->
 
-    <meta name="keywords" content="微服务,eureka" />
+    <meta name="keywords" content="死锁" />
 
 
     <meta name="description" content="
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
-
-微服务除了在内部相互调用，有时某些服务也会提供给外部应用。当然不能让外部应用也加入到“大家庭”里，毕竟知人知面不知源码..." />
+死锁是指两个或两个以上的进程在执行过程中，由于竞争资源或者由于彼此通信而造成的一种阻塞的现象，若无外力作用，它们都将无法推进下去。此时称系统处于死锁状态或系统产生了死锁，这些永远在互相等待的进..." />
 
 
 
@@ -36,7 +34,7 @@
     <!--Title-->
 
 
-<title>从0.5到1写个rpc框架 - 7:网关支持(gateway) | 一杯82年的JAVA</title>
+<title>死锁的四大条件与处理策略 | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -150,16 +148,16 @@
                     <p id="process"></p>
 <article class="post">
     <div class="post-head">
-        <h1 id="从0.5到1写个rpc框架 - 7:网关支持(gateway)">
+        <h1 id="死锁的四大条件与处理策略">
             
-	            从0.5到1写个rpc框架 - 7:网关支持(gateway)
+	            死锁的四大条件与处理策略
             
         </h1>
         <div class="post-meta">
     
         <span class="categories-meta fa-wrap">
             <i class="fa fa-folder-open-o"></i>
-            <a class="category-link" href="/categories/微服务/">微服务</a>
+            <a class="category-link" href="/categories/面试杂谈/">面试杂谈</a>
         </span>
     
 
@@ -168,7 +166,7 @@
             <i class="fa fa-tags"></i>
             <span class="tags-meta">
                 
-                    <a class="tag-link" href="/tags/eureka/">eureka</a> <a class="tag-link" href="/tags/微服务/">微服务</a>
+                    <a class="tag-link" href="/tags/死锁/">死锁</a>
                 
             </span>
         </span>
@@ -178,7 +176,7 @@
         
         <span class="fa-wrap">
             <i class="fa fa-clock-o"></i>
-            <span class="date-meta">2019/07/13</span>
+            <span class="date-meta">2019/07/21</span>
         </span>
         
             <span class="fa-wrap">
@@ -194,22 +192,34 @@
     
     <div class="post-body post-content">
         <blockquote>
-<p>这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：<a href="https://github.com/acupt/acuprpc" target="_blank" rel="noopener">acuprpc</a></p>
+<p>死锁是指两个或两个以上的进程在执行过程中，由于竞争资源或者由于彼此通信而造成的一种阻塞的现象，若无外力作用，它们都将无法推进下去。此时称系统处于死锁状态或系统产生了死锁，这些永远在互相等待的进程称为死锁进程。</p>
 </blockquote>
-<p>微服务除了在内部相互调用，有时某些服务也会提供给外部应用。当然不能让外部应用也加入到“大家庭”里，毕竟知人知面不知源码，我们可以派出一个“前台”去接待它们，这就是“网关”。</p>
-<p><img src="/img/micro-service/gateway.png" alt="gateway"></p>
-<p>网关负责对接外部来宾，因此要做好安全措施，什么登陆、权限该上就上。</p>
-<p>流程如下：</p>
+<p>比如：两个线程A、B各自持有一个无法共享的资源，并且他们都需要获取对方现在持有的资源才能进行下一步，但是他们又必须等对方释放了才能去获取，于是A等待B，B也在等待A。如此这般，死锁就产生了。</p>
+<h2 id="产生死锁的四个条件"><a href="#产生死锁的四个条件" class="headerlink" title="产生死锁的四个条件"></a>产生死锁的四个条件</h2><p>死锁的发生必须具备以下四个必要条件</p>
+<h3 id="互斥条件（Mutual-exclusion）"><a href="#互斥条件（Mutual-exclusion）" class="headerlink" title="互斥条件（Mutual exclusion）"></a>互斥条件（Mutual exclusion）</h3><pre><code>资源不能被共享，只能由一个进程使用。
+</code></pre><h3 id="请求与保持条件（Hold-and-wait）"><a href="#请求与保持条件（Hold-and-wait）" class="headerlink" title="请求与保持条件（Hold and wait）"></a>请求与保持条件（Hold and wait）</h3><pre><code>已经得到资源的进程可以再次申请新的资源。
+</code></pre><h3 id="不可剥夺条件（No-pre-emption）"><a href="#不可剥夺条件（No-pre-emption）" class="headerlink" title="不可剥夺条件（No pre-emption）"></a>不可剥夺条件（No pre-emption）</h3><pre><code>已经分配的资源不能从相应的进程中被强制地剥夺。
+</code></pre><h3 id="环路-循环等待条件（Circular-wait）"><a href="#环路-循环等待条件（Circular-wait）" class="headerlink" title="环路/循环等待条件（Circular wait）"></a>环路/循环等待条件（Circular wait）</h3><pre><code>系统中若干进程组成环路，该环路中每个进程都在等待相邻进程正占用的资源。
+</code></pre><p>了解四个必要条件后再来看看开始的例子：</p>
+<p>两个线程各自持有一个无法共享(互斥条件)的资源，并且他们都需要获取（请求与保持条件）对方现在持有的资源才能进行下一步，但是他们又必须等对方释放了才能去获取(不可剥夺条件)，于是A等待B，B也在等待A（环路等待条件）。如此这般，死锁就产生了。</p>
+<h2 id="预防死锁"><a href="#预防死锁" class="headerlink" title="预防死锁"></a>预防死锁</h2><p>通过破坏四个必要条件中的一个或多个，使死锁永远无法满足。实现简单，但是由于所施加的限制条件往往太严格，可能会导致系统资源利用率和系统吞吐量降低。</p>
+<h3 id="预先资源分配法"><a href="#预先资源分配法" class="headerlink" title="预先资源分配法"></a>预先资源分配法</h3><p>一次性申请所有需要的资源，只要有一种资源不满足要求，哪怕其它需要的资源都足够，也不做任何分配。这样一来就没有“保持”资源的状态，只有“请求”资源的状态，破坏了请求与保持条件。</p>
+<h3 id="有序资源分配法"><a href="#有序资源分配法" class="headerlink" title="有序资源分配法"></a>有序资源分配法</h3><p>在申请不同类资源时，必须按指定顺序申请，破坏了环路等待条件。</p>
 <ul>
-<li>网关收到请求</li>
-<li>解析请求（服务名，方法，参数等）</li>
-<li>选择一个实例（来自注册中心）</li>
-<li>RPC调用</li>
-<li>结果返回给请求方</li>
+<li>正例：线程A、B申请资源顺序均为R1-&gt;R2；</li>
+<li>反例：A申请顺序为R1-&gt;R2，B申请顺序为R2-&gt;R1。</li>
 </ul>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping</span>(<span class="string">"/api"</span>)</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApiController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 动态调用rpc服务的关键，在acuprpc-spring-boot-starter中已经生成，可以随时引用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> RpcClientManager rpcClientManager;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ApiController</span><span class="params">(RpcClientManager rpcClientManager)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.rpcClientManager = rpcClientManager;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(method = RequestMethod.POST, produces = <span class="string">"application/json"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(@RequestBody RpcRequestDTO requestDTO)</span> </span>&#123;</span><br><span class="line">        RpcServiceInfo serviceInfo = <span class="keyword">new</span> RpcServiceInfo(requestDTO.getApp(), requestDTO.getService());</span><br><span class="line">        RpcClient client = rpcClientManager.lookup(serviceInfo);<span class="comment">//获取一个可以提供所需服务的连接</span></span><br><span class="line">        RpcRequest request = <span class="keyword">new</span> RpcRequest(requestDTO.getApp(), requestDTO.getService(), requestDTO.getMethod());</span><br><span class="line">        <span class="keyword">if</span> (requestDTO.getParameters() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            Map&lt;String, String&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">            requestDTO.getParameters().forEach((k, v) -&gt; map.put(k, JsonUtil.toJson(v)));</span><br><span class="line">            request.setNamedParameter(map);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> client.invoke(request);<span class="comment">//调用服务获得返回的json字符串</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个demo作为一个子模块（acuprpc-spring-boot-starter-gateway）加入了框架的全家桶，直接引入依赖就能使用这个功能。</p>
-<p>基于这个方法，可以实现更加复杂的也无需求，这里就不细讲了，本系列结束。</p>
+<h2 id="避免死锁"><a href="#避免死锁" class="headerlink" title="避免死锁"></a>避免死锁</h2><p>也是预发死锁，但不会事先去破坏死锁的必要条件，只是有人请求资源时，用某种方法防止系统进入不安全的状态（死锁），从而避免发生死锁。</p>
+<h3 id="银行家算法"><a href="#银行家算法" class="headerlink" title="银行家算法"></a>银行家算法</h3><p>基本思想是分配资源之前，判断系统是否是安全的；若是，才分配。</p>
+<h2 id="检测死锁和解除"><a href="#检测死锁和解除" class="headerlink" title="检测死锁和解除"></a>检测死锁和解除</h2><p>不采取措施防止死锁产生，允许系统产生死锁，但是可以通过一些手段检测出死锁，然后将死锁解除。</p>
+<p>检测方法：</p>
+<ol>
+<li>定时检测</li>
+<li>效率低时检测</li>
+<li>进程等待时检测</li>
+</ol>
+<p>解除死锁方法：</p>
+<p>根据具体业务场景，可以撤销或挂起死锁的进程/线程，使资源释放。</p>
 
     </div>
     
@@ -243,15 +253,10 @@
 
 <div class="article-nav prev-next-wrap clearfix">
     
-        <a href="/2019/07/15/interview-gc/" class="pre-post btn btn-default" title='JAVA GC 简析'>
-            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
-            <span class="hidden-xs">JAVA GC 简析</span>
-        </a>
     
-    
-        <a href="/2019/07/13/acuprpc-6/" class="next-post btn btn-default" title='从0.5到1写个rpc框架 - 6:调用异常节点自动重试'>
+        <a href="/2019/07/17/java-string/" class="next-post btn btn-default" title='JAVA中的String真的不可变吗'>
             <span class="hidden-lg">下一篇</span>
-            <span class="hidden-xs">从0.5到1写个rpc框架 - 6:调用异常节点自动重试</span><i class="fa fa-angle-right fa-fw"></i>
+            <span class="hidden-xs">JAVA中的String真的不可变吗</span><i class="fa fa-angle-right fa-fw"></i>
         </a>
     
 </div>
@@ -292,7 +297,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <p>暂无目录</p>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#产生死锁的四个条件"><span class="toc-text">产生死锁的四个条件</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#互斥条件（Mutual-exclusion）"><span class="toc-text">互斥条件（Mutual exclusion）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#请求与保持条件（Hold-and-wait）"><span class="toc-text">请求与保持条件（Hold and wait）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#不可剥夺条件（No-pre-emption）"><span class="toc-text">不可剥夺条件（No pre-emption）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#环路-循环等待条件（Circular-wait）"><span class="toc-text">环路/循环等待条件（Circular wait）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#预防死锁"><span class="toc-text">预防死锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#预先资源分配法"><span class="toc-text">预先资源分配法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#有序资源分配法"><span class="toc-text">有序资源分配法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免死锁"><span class="toc-text">避免死锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#银行家算法"><span class="toc-text">银行家算法</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检测死锁和解除"><span class="toc-text">检测死锁和解除</span></a></li></ol>
         
     </div>
 </aside>
