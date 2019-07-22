@@ -1,0 +1,370 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="并发" />
+
+
+    <meta name="description" content="
+使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享。
+
+从SimpleDateFormat说起SimpleDateForm..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>JAVA并发实战 - ThreadLocal | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/教程/"><i class="fa "></i>教程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="JAVA并发实战 - ThreadLocal">
+            
+	            JAVA并发实战 - ThreadLocal
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/JAVA并发实战/">JAVA并发实战</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/并发/">并发</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/07/22</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享。</p>
+</blockquote>
+<h2 id="从SimpleDateFormat说起"><a href="#从SimpleDateFormat说起" class="headerlink" title="从SimpleDateFormat说起"></a>从SimpleDateFormat说起</h2><p>SimpleDateFormat是我们常用的日期格式化工具，但熟悉的朋友都知道它是线程不安全的。</p>
+<h3 id="SimpleDateFormat用法"><a href="#SimpleDateFormat用法" class="headerlink" title="SimpleDateFormat用法"></a>SimpleDateFormat用法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Acuptest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss,SSS"</span>);</span><br><span class="line">        System.out.println(sdf.format(<span class="keyword">new</span> Date()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SimpleDateFormat线程不安全场景"><a href="#SimpleDateFormat线程不安全场景" class="headerlink" title="SimpleDateFormat线程不安全场景"></a>SimpleDateFormat线程不安全场景</h3><p>上面的用完完全没有问题，但现在spring无处不在，很多类都是以bean的形式存在于spring容器被各种共享，一不小心就会写成下面这种样子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Acuptest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss,SSS"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">format</span><span class="params">(Date date)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sdf.format(date);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只是这样还看不出什么问题，但既然提到了SimpleDateFormat是线程不安全的，那么就看看为什么不安全。</p>
+<h3 id="SimpleDateFormat线程不安全分析"><a href="#SimpleDateFormat线程不安全分析" class="headerlink" title="SimpleDateFormat线程不安全分析"></a>SimpleDateFormat线程不安全分析</h3><p>进入源码，只看关键部分。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">DateFormat</span> <span class="keyword">extends</span> <span class="title">Format</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一个成员变量</span></span><br><span class="line">    <span class="keyword">protected</span> Calendar calendar;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一个抽象方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> StringBuffer <span class="title">format</span><span class="params">(Date date, StringBuffer toAppendTo, FieldPosition fieldPosition)</span></span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 提供给外部使用的方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> String <span class="title">format</span><span class="params">(Date date)</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> format(date, <span class="keyword">new</span> StringBuffer(),</span><br><span class="line">                      DontCareFieldPosition.INSTANCE).toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SimpleDateFormat</span> <span class="keyword">extends</span> <span class="title">DateFormat</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现了父类的抽象方法</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> StringBuffer <span class="title">format</span><span class="params">(Date date, StringBuffer toAppendTo, FieldPosition pos)</span></span>&#123;</span><br><span class="line">        pos.beginIndex = pos.endIndex = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">return</span> format(date, toAppendTo, pos.getFieldDelegate());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> StringBuffer <span class="title">format</span><span class="params">(Date date, StringBuffer toAppendTo, FieldDelegate delegate)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 到这里就能发现问题了，竟然给成员变量设置成了传进来的参数</span></span><br><span class="line">        <span class="comment">// 在并发情况下calendar的值就不可信了，可能线程A前脚刚设置完准备执行下一条语句，线程B紧随其后就把值给改了</span></span><br><span class="line">        <span class="comment">// Convert input date to time field list</span></span><br><span class="line">        calendar.setTime(date);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> useDateFormatSymbols = useDateFormatSymbols();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 略</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="SimpleDateFormat线程安全用法"><a href="#SimpleDateFormat线程安全用法" class="headerlink" title="SimpleDateFormat线程安全用法"></a>SimpleDateFormat线程安全用法</h3><h4 id="使用局部变量"><a href="#使用局部变量" class="headerlink" title="使用局部变量"></a>使用局部变量</h4><p>只要不让多线程访问同一个对象，每次要用就new一个对象即可。</p>
+<h4 id="使用ThreadLocal"><a href="#使用ThreadLocal" class="headerlink" title="使用ThreadLocal"></a>使用ThreadLocal</h4><p>很多时候某些对象往往不适合频繁创建、销毁，但它又像SimpleDateFormat那样线程不安全。这时候ThreadLocal就有用武之地了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Acuptest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 为每个线程单独分配一个SimpleDateFormat，线程内部可以复用，线程之间不能共享。</span></span><br><span class="line">    <span class="keyword">private</span> ThreadLocal&lt;SimpleDateFormat&gt; sdf = <span class="keyword">new</span> ThreadLocal&lt;SimpleDateFormat&gt;() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> SimpleDateFormat <span class="title">initialValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="comment">// get()方法获取不到当前线程的SimpleDateFormat对象时，会调用此方法创建一个并绑定到线程</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss,SSS"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">format</span><span class="params">(Date date)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> sdf.get().format(date);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ThreadLocal源码分析"><a href="#ThreadLocal源码分析" class="headerlink" title="ThreadLocal源码分析"></a>ThreadLocal源码分析</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">    <span class="comment">// 获取当前线程绑定的对象，如果没有，将调用initialValue生成一个并绑定</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 获取当前线程</span></span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        <span class="comment">// 从当前线程中取到一个MAP</span></span><br><span class="line">        <span class="comment">// key: ThreadLocal</span></span><br><span class="line">        <span class="comment">// value: ThreadLocal的泛型 &lt;T&gt;</span></span><br><span class="line">        ThreadLocalMap map = getMap(t);</span><br><span class="line">        <span class="keyword">if</span> (map != <span class="keyword">null</span>) &#123;</span><br><span class="line">            ThreadLocalMap.Entry e = map.getEntry(<span class="keyword">this</span>);</span><br><span class="line">            <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked"</span>)</span><br><span class="line">                T result = (T)e.value;</span><br><span class="line">                <span class="keyword">return</span> result;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Thread对象可能还没创建ThreadLocalMap成员变量</span></span><br><span class="line">        <span class="comment">// 或者ThreadLocalMap里没有当前ThreadLocal对象对应的&lt;T&gt;值</span></span><br><span class="line">        <span class="comment">// 此时需要设置初始值</span></span><br><span class="line">        <span class="keyword">return</span> setInitialValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取线程里的MAP</span></span><br><span class="line">    <span class="function">ThreadLocalMap <span class="title">getMap</span><span class="params">(Thread t)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> t.threadLocals;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置初始值</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> T <span class="title">setInitialValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 创建一个新的对象</span></span><br><span class="line">        T value = initialValue();</span><br><span class="line">        <span class="comment">// 重新获取当前线程，因为没有参数接收线程信息</span></span><br><span class="line">        Thread t = Thread.currentThread();</span><br><span class="line">        ThreadLocalMap map = getMap(t);</span><br><span class="line">        <span class="keyword">if</span> (map != <span class="keyword">null</span>)</span><br><span class="line">            map.set(<span class="keyword">this</span>, value); <span class="comment">// 设置初始值</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            createMap(t, value); <span class="comment">// 创建MAP并设置初始值</span></span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化一个对象，默认返回null，可在使用时重写此方法</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> T <span class="title">initialValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Thread源码分析"><a href="#Thread源码分析" class="headerlink" title="Thread源码分析"></a>Thread源码分析</h2><p>上面的源码中看到ThreadLocal多次使用Thread中的成员变量threadLocals，于是对Thread对象的结构再做个简单了解。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Thread</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* ThreadLocal values pertaining to this thread. This map is maintained</span></span><br><span class="line"><span class="comment">     * by the ThreadLocal class. */</span></span><br><span class="line">    ThreadLocal.ThreadLocalMap threadLocals = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * InheritableThreadLocal values pertaining to this thread. This map is</span></span><br><span class="line"><span class="comment">     * maintained by the InheritableThreadLocal class.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    ThreadLocal.ThreadLocalMap inheritableThreadLocals = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 略</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ThreadLocalMap</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference</span>&lt;<span class="title">ThreadLocal</span>&lt;?&gt;&gt; </span>&#123;</span><br><span class="line">            <span class="comment">/** The value associated with this ThreadLocal. */</span></span><br><span class="line">            Object value;</span><br><span class="line"></span><br><span class="line">            Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">                <span class="keyword">super</span>(k);</span><br><span class="line">                value = v;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * The table, resized as necessary.</span></span><br><span class="line"><span class="comment">         * table.length MUST always be a power of two.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">private</span> Entry[] table;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="threadLocals和inheritableThreadLocals"><a href="#threadLocals和inheritableThreadLocals" class="headerlink" title="threadLocals和inheritableThreadLocals"></a>threadLocals和inheritableThreadLocals</h3><p>从Thread源码中可以看到ThreadLocal.ThreadLocalMa类型的成员变量有两个，有个是之前没有见过的inheritableThreadLocals，这个变量不是给ThreadLocal<t>用的，而是给另一个类似的工具InheritableThreadLocal<t>用的。</t></t></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InheritableThreadLocal</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">ThreadLocal</span>&lt;<span class="title">T</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> T <span class="title">childValue</span><span class="params">(T parentValue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> parentValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">ThreadLocalMap <span class="title">getMap</span><span class="params">(Thread t)</span> </span>&#123;</span><br><span class="line">       <span class="keyword">return</span> t.inheritableThreadLocals;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">createMap</span><span class="params">(Thread t, T firstValue)</span> </span>&#123;</span><br><span class="line">        t.inheritableThreadLocals = <span class="keyword">new</span> ThreadLocalMap(<span class="keyword">this</span>, firstValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从源码上看，InheritableThreadLocal继承了ThreadLocal，然后使用的MAP换了，其他就没什么特别的。</p>
+<p>但InheritableThreadLocal<t>有着特殊的功能：它可以使用父线程的inheritableThreadLocals变量，实现父子线程共享变量。</t></p>
+<p>InheritableThreadLocal<t>为什么可以让子线程使用父线程的变量，关键的地方不在它，而在Thread类的初始化流程，Thread初始化时，</t></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Thread</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ThreadGroup g, Runnable target, String name,</span></span></span><br><span class="line"><span class="function"><span class="params">                      <span class="keyword">long</span> stackSize, AccessControlContext acc,</span></span></span><br><span class="line"><span class="function"><span class="params">                      <span class="keyword">boolean</span> inheritThreadLocals)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 略</span></span><br><span class="line">        Thread parent = currentThread();</span><br><span class="line">        <span class="comment">// 略</span></span><br><span class="line">        <span class="comment">// inheritThreadLocals默认为true</span></span><br><span class="line">        <span class="comment">// 父线程inheritableThreadLocals不为空则复制一份</span></span><br><span class="line">        <span class="comment">// 值复制，非引用复制</span></span><br><span class="line">        <span class="comment">// 只是复制父线程当前拥有的对象</span></span><br><span class="line">        <span class="keyword">if</span> (inheritThreadLocals &amp;&amp; parent.inheritableThreadLocals != <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">this</span>.inheritableThreadLocals =</span><br><span class="line">                ThreadLocal.createInheritedMap(parent.inheritableThreadLocals);</span><br><span class="line">        <span class="comment">// 略</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="ThreadLocal中的弱引用-WeakReference"><a href="#ThreadLocal中的弱引用-WeakReference" class="headerlink" title="ThreadLocal中的弱引用(WeakReference)"></a>ThreadLocal中的弱引用(WeakReference)</h3><p>从上面的源码中注意到: ThreadLocal<t>.ThreadLocalMap.Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt;</t></p>
+<p>Entry的key是ThreadLocal&lt;?&gt;，是个弱引用（被GC扫描到就回收）。如果不这样，当ThreadLocal&lt;?&gt;用完了，但线程还没结束，因此Thread里面还持有着ThreadLocal&lt;?&gt;的强引用，那么它永远不会被回收，可以认为内存泄漏了。</p>
+<h3 id="ThreadLocal的内存泄漏"><a href="#ThreadLocal的内存泄漏" class="headerlink" title="ThreadLocal的内存泄漏"></a>ThreadLocal的内存泄漏</h3><p>就算是使用了弱引用，依然存在内存泄漏的可能。因为弱引用仅仅是Entry的key(ThreadLocal)，value（泛型<t>）并不是弱引用。最终可能出现的结果就是，ThreadLocal被回收了，Thread里的MAP中KEY就没了，但value还在，这样一来这个value永远不会被get()方法返回，确又存在于内存不愿消散。</t></p>
+<p>内部实现尽量避免内存泄漏：</p>
+<blockquote>
+<p>在ThreadLocal的get()、set()、remove()方法调用的时候会清除掉线程ThreadLocalMap中所有Entry中Key为null的Value，并将整个Entry设置为null，利于下次内存回收。</p>
+</blockquote>
+<p>如果没有调用这些方法去触发这个过程，依然会内存泄漏，所以在线程用完这个对象后，可以显示调用remove方法使其清除。</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，岂不美哉</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/21/deadlock/" class="next-post btn btn-default" title='死锁的四大条件与处理策略'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">死锁的四大条件与处理策略</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#从SimpleDateFormat说起"><span class="toc-text">从SimpleDateFormat说起</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#SimpleDateFormat用法"><span class="toc-text">SimpleDateFormat用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SimpleDateFormat线程不安全场景"><span class="toc-text">SimpleDateFormat线程不安全场景</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SimpleDateFormat线程不安全分析"><span class="toc-text">SimpleDateFormat线程不安全分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SimpleDateFormat线程安全用法"><span class="toc-text">SimpleDateFormat线程安全用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#使用局部变量"><span class="toc-text">使用局部变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#使用ThreadLocal"><span class="toc-text">使用ThreadLocal</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#ThreadLocal源码分析"><span class="toc-text">ThreadLocal源码分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Thread源码分析"><span class="toc-text">Thread源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#threadLocals和inheritableThreadLocals"><span class="toc-text">threadLocals和inheritableThreadLocals</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ThreadLocal中的弱引用-WeakReference"><span class="toc-text">ThreadLocal中的弱引用(WeakReference)</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ThreadLocal的内存泄漏"><span class="toc-text">ThreadLocal的内存泄漏</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
