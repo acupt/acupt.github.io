@@ -22,9 +22,9 @@
 
 
     <meta name="description" content="
-使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享。
+使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享，但使用不当也会造成内存泄漏，先了解它，再使用它​。​
 
-从SimpleDateFormat说起SimpleDateForm..." />
+从Simple..." />
 
 
 
@@ -194,7 +194,7 @@
     
     <div class="post-body post-content">
         <blockquote>
-<p>使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享。</p>
+<p>使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享，但使用不当也会造成内存泄漏，先了解它，再使用它​。​</p>
 </blockquote>
 <h2 id="从SimpleDateFormat说起"><a href="#从SimpleDateFormat说起" class="headerlink" title="从SimpleDateFormat说起"></a>从SimpleDateFormat说起</h2><p>SimpleDateFormat是我们常用的日期格式化工具，但熟悉的朋友都知道它是线程不安全的。</p>
 <h3 id="SimpleDateFormat用法"><a href="#SimpleDateFormat用法" class="headerlink" title="SimpleDateFormat用法"></a>SimpleDateFormat用法</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Acuptest</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SimpleDateFormat sdf = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy-MM-dd HH:mm:ss,SSS"</span>);</span><br><span class="line">        System.out.println(sdf.format(<span class="keyword">new</span> Date()));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
