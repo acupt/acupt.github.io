@@ -1,0 +1,359 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="线程,并发,同步" />
+
+
+    <meta name="description" content="
+同步工具类是个笼统的概念，它可以根据自身状态来协调线程的控制流，了解JAVA中常用的同步工具能帮助开发者写出更好的并发代码。
+
+闭锁 CountDownLatch闭锁的作用相当于一扇门，在这扇..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>探索JAVA并发 - 同步工具类 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/教程/"><i class="fa "></i>教程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="探索JAVA并发 - 同步工具类">
+            
+	            探索JAVA并发 - 同步工具类
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/同步/">同步</a> <a class="tag-link" href="/tags/并发/">并发</a> <a class="tag-link" href="/tags/线程/">线程</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/07/23</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>同步工具类是个笼统的概念，它可以根据自身状态来协调线程的控制流，了解JAVA中常用的同步工具能帮助开发者写出更好的并发代码。</p>
+</blockquote>
+<h2 id="闭锁-CountDownLatch"><a href="#闭锁-CountDownLatch" class="headerlink" title="闭锁 CountDownLatch"></a>闭锁 CountDownLatch</h2><p>闭锁的作用相当于一扇门，在这扇门没打开前，任何线程执行到这里都会被无情扣押，直到有人打开了这扇门，那些阻塞在门外的线程才会继续进行门后的流程。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="comment">//第一扇门，需要1次触发即可打开</span></span><br><span class="line">        CountDownLatch firstDoor = <span class="keyword">new</span> CountDownLatch(<span class="number">1</span>);</span><br><span class="line">        <span class="comment">//第二扇门，需要3次触发才可打开</span></span><br><span class="line">        CountDownLatch lastDoor = <span class="keyword">new</span> CountDownLatch(<span class="number">3</span>);</span><br><span class="line">        <span class="comment">//启动3个线程</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">3</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> id = i;</span><br><span class="line">            <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    System.out.println(id + <span class="string">"号靓仔到达第一扇门前"</span>);</span><br><span class="line">                    firstDoor.await();</span><br><span class="line">                    Thread.sleep((<span class="keyword">long</span>) (Math.random() * <span class="number">5000</span>));<span class="comment">//随机休息一会</span></span><br><span class="line">                    System.out.println(id + <span class="string">"号靓仔到达第二扇门前并触发"</span>);</span><br><span class="line">                    lastDoor.countDown();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        <span class="comment">//主线程打开第一扇门，让其他线程可以通过</span></span><br><span class="line">        firstDoor.countDown();</span><br><span class="line">        <span class="comment">//等待其他线程合力打开第二扇门</span></span><br><span class="line">        lastDoor.await();</span><br><span class="line">        System.out.println(<span class="string">"bye~"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">1号靓仔到达第一扇门前</span></span><br><span class="line"><span class="comment">3号靓仔到达第一扇门前</span></span><br><span class="line"><span class="comment">2号靓仔到达第一扇门前</span></span><br><span class="line"><span class="comment">1号靓仔到达第二扇门前并触发</span></span><br><span class="line"><span class="comment">2号靓仔到达第二扇门前并触发</span></span><br><span class="line"><span class="comment">3号靓仔到达第二扇门前并触发</span></span><br><span class="line"><span class="comment">bye~</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="闭锁-FutureTask"><a href="#闭锁-FutureTask" class="headerlink" title="闭锁 FutureTask"></a>闭锁 FutureTask</h2><p>FutureTask也可以用作闭锁，常与线程池一起使用，提交到线程池后，主线程（提交任务的线程）调用get()方法阻塞线程直到异步任务执行完毕或超时。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.Callable;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.CountDownLatch;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutionException;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.FutureTask;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</span><br><span class="line">        <span class="comment">// 方式1：传入一个Callable，即业务代码执行完直接return</span></span><br><span class="line">        FutureTask&lt;Liangzai&gt; callableTask = <span class="keyword">new</span> FutureTask&lt;&gt;(<span class="keyword">new</span> Callable&lt;Liangzai&gt;() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> Liangzai <span class="title">call</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                Liangzai liangzai = <span class="keyword">new</span> Liangzai();</span><br><span class="line">                liangzai.name = <span class="string">"callable"</span>;</span><br><span class="line">                <span class="keyword">return</span> liangzai;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 方式2：传入一个runnable和一个存储结果的对象，在runnable中修改结果对象</span></span><br><span class="line">        Liangzai runableLiangzai = <span class="keyword">new</span> Liangzai();</span><br><span class="line">        FutureTask&lt;Liangzai&gt; runableTask = <span class="keyword">new</span> FutureTask&lt;&gt;(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">                    runableLiangzai.name = <span class="string">"runable"</span>;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;, runableLiangzai);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 异步给靓仔取名</span></span><br><span class="line">        <span class="keyword">new</span> Thread(callableTask).start();</span><br><span class="line">        <span class="comment">// 等待名字确定完毕</span></span><br><span class="line">        Liangzai liangzai = callableTask.get();</span><br><span class="line">        System.out.println(liangzai);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 异步给靓仔取名</span></span><br><span class="line">        <span class="keyword">new</span> Thread(runableTask).start();</span><br><span class="line">        <span class="comment">// 等待名字确定完毕</span></span><br><span class="line">        liangzai = runableTask.get();</span><br><span class="line">        System.out.println(liangzai);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Liangzai</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        String name;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"Liangzai&#123;"</span> +</span><br><span class="line">                    <span class="string">"name='"</span> + name + <span class="string">'\''</span> +</span><br><span class="line">                    <span class="string">'&#125;'</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Liangzai&#123;name='callable'&#125;</span></span><br><span class="line"><span class="comment">Liangzai&#123;name='runable'&#125;</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="信号量-Semaphore"><a href="#信号量-Semaphore" class="headerlink" title="信号量 Semaphore"></a>信号量 Semaphore</h2><p>信号量用来控制同时“访问资源”或“执行操作”的线程数量，也可以用来实现资源池等。它管理着一组虚拟的“许可”，每当线程想访问某个特殊资源，需要先向它申请一个许可，用完后再返还许可，许可不足时将阻塞。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</span><br><span class="line">        <span class="comment">// 初始化2个许可</span></span><br><span class="line">        Semaphore semaphore = <span class="keyword">new</span> Semaphore(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 不想用线程池，用这个实现主线程等待所有子线程执行完毕</span></span><br><span class="line">        <span class="keyword">int</span> n = <span class="number">10</span>;</span><br><span class="line">        CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(n);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> id = i;</span><br><span class="line">            <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 申请一个许可</span></span><br><span class="line">                    System.out.println(id + <span class="string">"号想要1个许可"</span>);</span><br><span class="line">                    semaphore.acquire();</span><br><span class="line">                    System.out.println(id + <span class="string">"号得到1个许可"</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 持有许可一段时间</span></span><br><span class="line">                    Thread.sleep((<span class="keyword">long</span>) (Math.random() * <span class="number">10000</span>));</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 归还许可</span></span><br><span class="line">                    semaphore.release();</span><br><span class="line">                    System.out.println(id + <span class="string">"号归还1个许可"</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 此线程完毕</span></span><br><span class="line">                    countDownLatch.countDown();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">        countDownLatch.await();</span><br><span class="line">        System.out.println(<span class="string">"done~"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">1号想要1个许可</span></span><br><span class="line"><span class="comment">2号想要1个许可</span></span><br><span class="line"><span class="comment">1号得到1个许可</span></span><br><span class="line"><span class="comment">2号得到1个许可</span></span><br><span class="line"><span class="comment">3号想要1个许可</span></span><br><span class="line"><span class="comment">4号想要1个许可</span></span><br><span class="line"><span class="comment">5号想要1个许可</span></span><br><span class="line"><span class="comment">6号想要1个许可</span></span><br><span class="line"><span class="comment">7号想要1个许可</span></span><br><span class="line"><span class="comment">8号想要1个许可</span></span><br><span class="line"><span class="comment">9号想要1个许可</span></span><br><span class="line"><span class="comment">10号想要1个许可</span></span><br><span class="line"><span class="comment">2号归还1个许可</span></span><br><span class="line"><span class="comment">3号得到1个许可</span></span><br><span class="line"><span class="comment">1号归还1个许可</span></span><br><span class="line"><span class="comment">4号得到1个许可</span></span><br><span class="line"><span class="comment">3号归还1个许可</span></span><br><span class="line"><span class="comment">5号得到1个许可</span></span><br><span class="line"><span class="comment">4号归还1个许可</span></span><br><span class="line"><span class="comment">6号得到1个许可</span></span><br><span class="line"><span class="comment">5号归还1个许可</span></span><br><span class="line"><span class="comment">7号得到1个许可</span></span><br><span class="line"><span class="comment">6号归还1个许可</span></span><br><span class="line"><span class="comment">8号得到1个许可</span></span><br><span class="line"><span class="comment">7号归还1个许可</span></span><br><span class="line"><span class="comment">9号得到1个许可</span></span><br><span class="line"><span class="comment">9号归还1个许可</span></span><br><span class="line"><span class="comment">10号得到1个许可</span></span><br><span class="line"><span class="comment">10号归还1个许可</span></span><br><span class="line"><span class="comment">8号归还1个许可</span></span><br><span class="line"><span class="comment">done~</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>上面的代码，由于只有两个许可，所有前两个线程一说想要马上就得到了，第三个开始就开始了不算漫长的等待，下一次有线程得到许可是在有一个线程归还许可之后。</p>
+<h2 id="栅栏-CyclicBarrier"><a href="#栅栏-CyclicBarrier" class="headerlink" title="栅栏 CyclicBarrier"></a>栅栏 CyclicBarrier</h2><p>CyclicBarrier类似于CountDownLatch，也是阻塞一组线程直到某个时间点，区别如下。</p>
+<ul>
+<li>闭锁 CountDownLatch：等待一组线程全部完成某个任务，然后等待线程继续执行后续动作。结束后状态不会再改变</li>
+<li>栅栏 CyclicBarrier：等待一组线程全部到达某个位置，然后该组线程继续执行后续动作，该组线程互相等待。状态可以重置。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</span><br><span class="line">        <span class="comment">// 定义一个栅栏，等待3个人到达后一起嗨皮</span></span><br><span class="line">        <span class="keyword">int</span> n = <span class="number">3</span>;</span><br><span class="line">        CyclicBarrier barrier = <span class="keyword">new</span> CyclicBarrier(n, <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="comment">// 全部人就绪后执行的操作</span></span><br><span class="line">                System.out.println(<span class="string">"大家都到齐了，开始happy去"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 不想用线程池，用这个实现主线程等待所有子线程执行完毕</span></span><br><span class="line">        CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(n);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= n; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> id = i;</span><br><span class="line">            <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 每个人出门打扮需要的时间都是不同的</span></span><br><span class="line">                    Thread.sleep((<span class="keyword">long</span>) (Math.random() * <span class="number">5000</span>));</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 等待其他人到达这里</span></span><br><span class="line">                    System.out.println(id + <span class="string">": 我到地方了"</span>);</span><br><span class="line">                    barrier.await();</span><br><span class="line">                    System.out.println(id + <span class="string">": let's go"</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 此线程完毕</span></span><br><span class="line">                    countDownLatch.countDown();</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">        countDownLatch.await();</span><br><span class="line">        System.out.println(<span class="string">"done~"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">3: 我到地方了</span></span><br><span class="line"><span class="comment">2: 我到地方了</span></span><br><span class="line"><span class="comment">1: 我到地方了</span></span><br><span class="line"><span class="comment">大家都到齐了，开始happy去</span></span><br><span class="line"><span class="comment">1: let's go</span></span><br><span class="line"><span class="comment">3: let's go</span></span><br><span class="line"><span class="comment">2: let's go</span></span><br><span class="line"><span class="comment">done~</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="栅栏-Exchanger"><a href="#栅栏-Exchanger" class="headerlink" title="栅栏 Exchanger"></a>栅栏 Exchanger</h2><p>Exchanger是一种两方的栅栏，用于两方之间交换数据，一方发出消息后会阻塞直到对方接受到消息并返回一个消息，达到一人一句的和谐交流。当两方的操作不对称时很有用，比如一个线程往缓冲区写数据，一个线程从缓冲区读数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</span><br><span class="line">        Exchanger&lt;String&gt; exchanger = <span class="keyword">new</span> Exchanger&lt;&gt;();</span><br><span class="line">        CountDownLatch countDownLatch = <span class="keyword">new</span> CountDownLatch(<span class="number">2</span>);</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">                    Thread.sleep((<span class="keyword">long</span>) (Math.random() * <span class="number">5000</span>));</span><br><span class="line">                    String fromKun = exchanger.exchange(<span class="string">"我是小菜，No."</span> + i);</span><br><span class="line">                    System.out.println(<span class="string">"小菜收到消息："</span> + fromKun);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;).start();</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">                    Thread.sleep((<span class="keyword">long</span>) (Math.random() * <span class="number">5000</span>));</span><br><span class="line">                    String fromKun = exchanger.exchange(<span class="string">"我是阿坤，No."</span> + i);</span><br><span class="line">                    System.out.println(<span class="string">"阿坤收到消息："</span> + fromKun);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            countDownLatch.countDown();</span><br><span class="line">        &#125;).start();</span><br><span class="line">        countDownLatch.await();</span><br><span class="line">        System.out.println(<span class="string">"done~"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">小菜收到消息：我是阿坤，No.0</span></span><br><span class="line"><span class="comment">阿坤收到消息：我是小菜，No.0</span></span><br><span class="line"><span class="comment">阿坤收到消息：我是小菜，No.1</span></span><br><span class="line"><span class="comment">小菜收到消息：我是阿坤，No.1</span></span><br><span class="line"><span class="comment">阿坤收到消息：我是小菜，No.2</span></span><br><span class="line"><span class="comment">小菜收到消息：我是阿坤，No.2</span></span><br><span class="line"><span class="comment">小菜收到消息：我是阿坤，No.3</span></span><br><span class="line"><span class="comment">阿坤收到消息：我是小菜，No.3</span></span><br><span class="line"><span class="comment">阿坤收到消息：我是小菜，No.4</span></span><br><span class="line"><span class="comment">小菜收到消息：我是阿坤，No.4</span></span><br><span class="line"><span class="comment">done~</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>所谓同步工具类并不特指实现某种功能的类，它们主要的价值就在于能帮助多线程之间更好地相互配合完成工作，只要对自己的需求清晰，对JAVA自带的类熟悉，就能选择合适的同步工具类，甚至实现自己需要的同步工具类。</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">赏
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信打赏</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，岂不美哉</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/22/concurrent_threadlocal/" class="next-post btn btn-default" title='探索JAVA并发 - ThreadLocal'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">探索JAVA并发 - ThreadLocal</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#闭锁-CountDownLatch"><span class="toc-text">闭锁 CountDownLatch</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#闭锁-FutureTask"><span class="toc-text">闭锁 FutureTask</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#信号量-Semaphore"><span class="toc-text">信号量 Semaphore</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#栅栏-CyclicBarrier"><span class="toc-text">栅栏 CyclicBarrier</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#栅栏-Exchanger"><span class="toc-text">栅栏 Exchanger</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
