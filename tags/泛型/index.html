@@ -33,7 +33,7 @@
     <!--Title-->
 
 
-<title>分类: 并发编程 | 一杯82年的JAVA</title>
+<title>标签: 泛型 | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -152,8 +152,9 @@
     
     
         <li>
-            并发编程
+            泛型
         </li>
+    
     
 
 </ol>
@@ -164,101 +165,25 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
-                    <a href="/2019/07/25/concurrent-interrupt/">探索JAVA并发 - 如何处理线程中断</a>
+                    <a href="/2019/07/28/java-generics-type-erasure/">JAVA泛型与类型擦除</a>
                 </h1>
                 <div class="post-meta">  &bull;
                     <time class="post-date" datetime="" title="">
-                        2019年07月25日
+                        2019年07月28日
                     </time>
                 </div>
             </div>
             <p class="brief">
                 
                     
-中断是一种协作机制，通过这种机制可以要求指定线程在可以暂停的地方停止当前任务，但这个要求可以无视，我们也经常这么做（虽然不好），那应该这么对待其它线程发来的中断要求呢？
+泛型的本质是参数化类型，这种参数类型可以用在类、接口和方法的创建中。泛型是在JAVA 1.5版本中才引入的，它能和以前的版本兼容的原因是泛型信息只存在于代码编译阶段，在进入 JVM 之前，与泛型相关的信息会被擦除掉，即类型擦除。
 
-在上一篇如何优雅地取消线程任务中提到了通过中断可以取消线程正...
+...
                 
             </p>
         </div>
     </article>
  
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/24/concurrent-thread-cancel/">探索JAVA并发 - 如何优雅地取消线程任务</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月24日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-通过线程启动一个异步的任务很容易，但想让它提前安全且快速地结束确并不简单。如果线程外部的代码可以提前把目标线程置为“完成”状态，那么这个目标线程就是可取消的。
-
-线程任务取消的原因一般有如下几种：
-
-用户请求取消: 比如用户发起一个...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/23/concurrent-sync-tool/">探索JAVA并发 - 同步工具类</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月23日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-同步工具类是个笼统的概念，它可以根据自身状态来协调线程的控制流，了解JAVA中常用的同步工具能帮助开发者写出更好的并发代码。
-
-闭锁 CountDownLatch闭锁的作用相当于一扇门，在这扇门没打开前，任何线程执行到这里都会被无情...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/22/concurrent_threadlocal/">探索JAVA并发 - ThreadLocal</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月22日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享，但使用不当也会造成内存泄漏，先了解它，再使用它​。​
-
-从SimpleDateFormat说起SimpleDa...
-                
-            </p>
-        </div>
-    </article>
- 
-
-
 
 
 
