@@ -1,0 +1,357 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="jvm" />
+
+
+    <meta name="description" content="
+通过关闭钩子，我们可以在应用关闭时做一些自定义的操作，让程序更优雅的结束。
+
+JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关闭。关闭的方式有多种，根据其行为的文明程..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>源码分析 - JVM关闭钩子的注册和调用 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="源码分析 - JVM关闭钩子的注册和调用">
+            
+	            源码分析 - JVM关闭钩子的注册和调用
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/JAVA/">JAVA</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/jvm/">jvm</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/07/29</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>通过关闭钩子，我们可以在应用关闭时做一些自定义的操作，让程序更优雅的结束。</p>
+</blockquote>
+<p>JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关闭。关闭的方式有多种，根据其行为的文明程度可大概分为两种：</p>
+<ul>
+<li>正常关闭<br>  所有普通线程（非守护线程）执行完毕<br>  System.exit(status)<br>  Ctrl - C<br>  …</li>
+<li>强行关闭<br>  kill进程<br>  Runtime.halt(status)<br>  …</li>
+</ul>
+<h2 id="JVM关闭钩子DEMO"><a href="#JVM关闭钩子DEMO" class="headerlink" title="JVM关闭钩子DEMO"></a>JVM关闭钩子DEMO</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> MyHook());</span><br><span class="line">        System.out.println(<span class="string">"结束吧"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyHook</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"你先走，我垫后"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">结束吧</span></span><br><span class="line"><span class="comment">你先走，我垫后</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="自定义钩子如何注册"><a href="#自定义钩子如何注册" class="headerlink" title="自定义钩子如何注册"></a>自定义钩子如何注册</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Runtime</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 钩子对象必须是一个Thread（或其子类）</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addShutdownHook</span><span class="params">(Thread hook)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 看起来是个权限检查</span></span><br><span class="line">        SecurityManager sm = System.getSecurityManager();</span><br><span class="line">        <span class="keyword">if</span> (sm != <span class="keyword">null</span>) &#123;</span><br><span class="line">            sm.checkPermission(<span class="keyword">new</span> RuntimePermission(<span class="string">"shutdownHooks"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 真正的注册逻辑在这个类里面</span></span><br><span class="line">        ApplicationShutdownHooks.add(hook);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ApplicationShutdownHooks</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 钩子集合</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> IdentityHashMap&lt;Thread, Thread&gt; hooks;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册一个钩子</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(Thread hook)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span>(hooks == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Shutdown in progress"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 看来注册前不能让Thread跑起来</span></span><br><span class="line">        <span class="keyword">if</span> (hook.isAlive())</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Hook already running"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 同一个钩子不能重复注册</span></span><br><span class="line">        <span class="keyword">if</span> (hooks.containsKey(hook))</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Hook previously registered"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 放进集合就算注册成功了？继续往下看</span></span><br><span class="line">        hooks.put(hook, hook);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化，本来在最前面，为了跟随我的节奏被我移到后面了</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 看来这个类也不是真正实现钩子回调的地方</span></span><br><span class="line">            <span class="comment">// 又在Shutdown注册了一个“钩子”，通过这个“钩子”来执行用户自定义的钩子</span></span><br><span class="line">            Shutdown.add(<span class="number">1</span> <span class="comment">/* shutdown hook invocation order */</span>,</span><br><span class="line">                <span class="keyword">false</span> <span class="comment">/* not registered if shutdown in progress */</span>,</span><br><span class="line">                <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        runHooks();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            );</span><br><span class="line">            hooks = <span class="keyword">new</span> IdentityHashMap&lt;&gt;();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IllegalStateException e) &#123;</span><br><span class="line">            <span class="comment">// application shutdown hooks cannot be added if</span></span><br><span class="line">            <span class="comment">// shutdown is in progress.</span></span><br><span class="line">            hooks = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行用户钩子的钩子函数</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">runHooks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Collection&lt;Thread&gt; threads;</span><br><span class="line">        <span class="keyword">synchronized</span>(ApplicationShutdownHooks.class) &#123;</span><br><span class="line">            threads = hooks.keySet();</span><br><span class="line">            hooks = <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (Thread hook : threads) &#123;</span><br><span class="line">            hook.start();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Thread hook : threads) &#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    hook.join();</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException ignored) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>简单追踪了一下注册钩子的源码，发现是通过在Shutdown注册一个钩子来执行用户的钩子。那么Shutdown又是怎么在关闭时执行钩子的呢？</p>
+<h2 id="钩子如何被调用"><a href="#钩子如何被调用" class="headerlink" title="钩子如何被调用"></a>钩子如何被调用</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> java.lang;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Shutdown</span> </span>&#123;</span><br><span class="line">    <span class="comment">/* Shutdown state */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> RUNNING = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> HOOKS = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> FINALIZERS = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> state = RUNNING;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Should we run all finalizers upon exit? */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">boolean</span> runFinalizersOnExit = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// The system shutdown hooks are registered with a predefined slot.</span></span><br><span class="line">    <span class="comment">// The list of shutdown hooks is as follows:</span></span><br><span class="line">    <span class="comment">// (0) Console restore hook</span></span><br><span class="line">    <span class="comment">// (1) Application hooks</span></span><br><span class="line">    <span class="comment">// (2) DeleteOnExit hook</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 钩子集合容量，有点小，但是看注释目前就3个，倒是足够了，不知道有没有没列出来的</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> MAX_SYSTEM_HOOKS = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 钩子集合</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Runnable[] hooks = <span class="keyword">new</span> Runnable[MAX_SYSTEM_HOOKS];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 注册一个钩子</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">int</span> slot, <span class="keyword">boolean</span> registerShutdownInProgress, Runnable hook)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            <span class="keyword">if</span> (hooks[slot] != <span class="keyword">null</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> InternalError(<span class="string">"Shutdown hook at slot "</span> + slot + <span class="string">" already registered"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (!registerShutdownInProgress) &#123;</span><br><span class="line">                <span class="keyword">if</span> (state &gt; RUNNING)</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Shutdown in progress"</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (state &gt; HOOKS || (state == HOOKS &amp;&amp; slot &lt;= currentRunningHook))</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Shutdown in progress"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 刚才ApplicationShutdownHooks传的是：(1) Application hooks</span></span><br><span class="line">            hooks[slot] = hook;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 除了add，这是唯一引用hooks的地方了</span></span><br><span class="line">    <span class="comment">// 可以看出是顺序执行3种钩子</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">runHooks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; MAX_SYSTEM_HOOKS; i++) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Runnable hook;</span><br><span class="line">                <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">                    <span class="comment">// acquire the lock to make sure the hook registered during</span></span><br><span class="line">                    <span class="comment">// shutdown is visible here.</span></span><br><span class="line">                    currentRunningHook = i;</span><br><span class="line">                    hook = hooks[i];</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (hook != <span class="keyword">null</span>) hook.run();</span><br><span class="line">            &#125; <span class="keyword">catch</span>(Throwable t) &#123;</span><br><span class="line">                <span class="keyword">if</span> (t <span class="keyword">instanceof</span> ThreadDeath) &#123;</span><br><span class="line">                    ThreadDeath td = (ThreadDeath)t;</span><br><span class="line">                    <span class="keyword">throw</span> td;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行钩子的地方</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sequence</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            <span class="comment">/* Guard against the possibility of a daemon thread invoking exit</span></span><br><span class="line"><span class="comment">             * after DestroyJavaVM initiates the shutdown sequence</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            <span class="keyword">if</span> (state != HOOKS) <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        runHooks();<span class="comment">//执行钩子</span></span><br><span class="line">        <span class="keyword">boolean</span> rfoe;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            state = FINALIZERS;</span><br><span class="line">            rfoe = runFinalizersOnExit;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (rfoe) runAllFinalizers();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 下面两个方法是我们触发应用关闭的途径，均可执行钩子</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Invoked by Runtime.exit, which does all the security checks.</span></span><br><span class="line"><span class="comment">     * Also invoked by handlers for system-provided termination events,</span></span><br><span class="line"><span class="comment">     * which should pass a nonzero status code.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">// 强行翻译：通过Runtime.exit调用</span></span><br><span class="line">    <span class="comment">// 这是我们可以在程序中调用到的</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">exit</span><span class="params">(<span class="keyword">int</span> status)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">boolean</span> runMoreFinalizers = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            <span class="keyword">if</span> (status != <span class="number">0</span>) runFinalizersOnExit = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">switch</span> (state) &#123;</span><br><span class="line">            <span class="keyword">case</span> RUNNING:       <span class="comment">/* Initiate shutdown */</span></span><br><span class="line">                state = HOOKS;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> HOOKS:         <span class="comment">/* Stall and halt */</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> FINALIZERS:</span><br><span class="line">                <span class="keyword">if</span> (status != <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="comment">/* Halt immediately on nonzero status */</span></span><br><span class="line">                    halt(status);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">/* Compatibility with old behavior:</span></span><br><span class="line"><span class="comment">                     * Run more finalizers and then halt</span></span><br><span class="line"><span class="comment">                     */</span></span><br><span class="line">                    runMoreFinalizers = runFinalizersOnExit;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (runMoreFinalizers) &#123;</span><br><span class="line">            runAllFinalizers();</span><br><span class="line">            halt(status);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">synchronized</span> (Shutdown.class) &#123;</span><br><span class="line">            <span class="comment">/* Synchronize on the class object, causing any other thread</span></span><br><span class="line"><span class="comment">             * that attempts to initiate shutdown to stall indefinitely</span></span><br><span class="line"><span class="comment">             */</span></span><br><span class="line">            sequence();<span class="comment">//执行钩子</span></span><br><span class="line">            halt(status);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Invoked by the JNI DestroyJavaVM procedure when the last non-daemon</span></span><br><span class="line"><span class="comment">     * thread has finished.  Unlike the exit method, this method does not</span></span><br><span class="line"><span class="comment">     * actually halt the VM.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="comment">// 强行翻译：最后一个非守护线程结束后通过本地接口（JNI）调用。和exit方法不同，此方法没有真正停止虚拟机</span></span><br><span class="line">    <span class="comment">// 这个方法没有找到调用的代码</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">shutdown</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            <span class="keyword">switch</span> (state) &#123;</span><br><span class="line">            <span class="keyword">case</span> RUNNING:       <span class="comment">/* Initiate shutdown */</span></span><br><span class="line">                state = HOOKS;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> HOOKS:         <span class="comment">/* Stall and then return */</span></span><br><span class="line">            <span class="keyword">case</span> FINALIZERS:</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">synchronized</span> (Shutdown.class) &#123;</span><br><span class="line">            sequence();<span class="comment">// 执行钩子</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>简单的看了下源码，知道了exit和shutdown时都会通过某种流程和规则去执行到用户定义的钩子。</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/28/java-generics-type-erasure/" class="next-post btn btn-default" title='JAVA泛型与类型擦除'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">JAVA泛型与类型擦除</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#JVM关闭钩子DEMO"><span class="toc-text">JVM关闭钩子DEMO</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#自定义钩子如何注册"><span class="toc-text">自定义钩子如何注册</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#钩子如何被调用"><span class="toc-text">钩子如何被调用</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
