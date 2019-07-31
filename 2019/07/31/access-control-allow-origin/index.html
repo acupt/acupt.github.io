@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="跨域" />
+
+
+    <meta name="description" content="
+前端访问其它域名的资源往往会失败，那是因为浏览器出于安全考虑禁止了不同源的资源。
+
+同源策略
+同源策略，它是由Netscape提出的一个著名的安全策略。现在所有支持JavaScript的浏览器..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>跨域Access-Control-Allow-Origin解决方案 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2>   </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="跨域Access-Control-Allow-Origin解决方案">
+            
+	            跨域Access-Control-Allow-Origin解决方案
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/随笔/">随笔</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/跨域/">跨域</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/07/31</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>前端访问其它域名的资源往往会失败，那是因为浏览器出于安全考虑禁止了不同源的资源。</p>
+</blockquote>
+<h2 id="同源策略"><a href="#同源策略" class="headerlink" title="同源策略"></a>同源策略</h2><blockquote>
+<p>同源策略，它是由Netscape提出的一个著名的安全策略。现在所有支持JavaScript的浏览器都会使用这个策略。所谓同源是指，域名，协议，端口相同。同源策略是浏览器的行为，是为了保护本地数据不被JavaScript代码获取回来的数据污染，因此拦截的是客户端发出的请求回来的数据接收，即请求发送了，服务器响应了，但是无法被浏览器接收。</p>
+</blockquote>
+<p>同源：协议 + 域名 + 端口</p>
+<p>既然是浏览器的策略，则说明资源请求是可以正常返回的，只是浏览器不给用。</p>
+<h2 id="跨域报错"><a href="#跨域报错" class="headerlink" title="跨域报错"></a>跨域报错</h2><p>本地启动了一个web服务，地址为 127.0.0.1:8882 ，然后通过一个本地静态页面去请求这个接口。虽然在同一台电脑，但依然是跨域的。</p>
+<p><img src="/img/acao/跨域报错.png" alt="跨域报错"></p>
+<p>上面也说了这个限制是浏览器做的，看看接口，其实已经请求成功了，后端是执行了相关代码的。</p>
+<p><img src="/img/acao/跨域请求200.png" alt="跨域请求200"></p>
+<p><img src="/img/acao/跨域请求能到服务端.png" alt="跨域请求能到服务端"></p>
+<p><img src="/img/acao/跨域请求来源端口.png" alt="跨域请求来源端口"></p>
+<h2 id="后端修改Response支持跨域"><a href="#后端修改Response支持跨域" class="headerlink" title="后端修改Response支持跨域"></a>后端修改Response支持跨域</h2><p>从上面控制台的输出可以看到，错误原因是请求的资源（接口）的header中没有”Access-Control-Allow-Origin“，那我们可以给它加上。在哪加？既然说是请求的资源没有，那当然是在请求的资源上加，也就是服务端。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationA</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(ApplicationA.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/test"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">test</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 跨域支持</span></span><br><span class="line">        response.setHeader(<span class="string">"Access-Control-Allow-Origin"</span>, <span class="string">"*"</span>);</span><br><span class="line">        response.setHeader(<span class="string">"Access-Control-Allow-Methods"</span>, <span class="string">"POST,GET,PUT,DELETE"</span>);</span><br><span class="line">        response.setHeader(<span class="string">"Access-Control-Max-Age"</span>, <span class="string">"3600"</span>);</span><br><span class="line">        response.setHeader(<span class="string">"Access-Control-Allow-Headers"</span>, <span class="string">"*"</span>);</span><br><span class="line">        response.setHeader(<span class="string">"Access-Control-Allow-Credentials"</span>, <span class="string">"true"</span>);</span><br><span class="line">        Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">"success"</span>, <span class="keyword">true</span>);</span><br><span class="line">        map.put(<span class="string">"msg"</span>, <span class="string">"我来自服务端"</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再看看浏览器，已经可以正常访问接口了。</p>
+<p><img src="/img/acao/跨域请求成功.png" alt="跨域请求成功"></p>
+<p>如果觉得每个接口里面都要配置一下response很麻烦，可以在一个拦截器里面做这个事情。</p>
+<h2 id="springboot支持跨域"><a href="#springboot支持跨域" class="headerlink" title="springboot支持跨域"></a>springboot支持跨域</h2><p>测试用例是一个springboot项目，可以用更简单的方式。通过一个继承了WebMvcConfigurerAdapter的bean，重写addCorsMappings方法，在方法里配置。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationA</span> <span class="keyword">extends</span> <span class="title">WebMvcConfigurerAdapter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(ApplicationA.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/test"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">test</span><span class="params">(HttpServletRequest request, HttpServletResponse response)</span> </span>&#123;</span><br><span class="line">        Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">"success"</span>, <span class="keyword">true</span>);</span><br><span class="line">        map.put(<span class="string">"msg"</span>, <span class="string">"我来自服务端"</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 跨域支持</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addCorsMappings</span><span class="params">(CorsRegistry registry)</span> </span>&#123;</span><br><span class="line">        registry.addMapping(<span class="string">"/**"</span>)</span><br><span class="line">                .allowedOrigins(<span class="string">"*"</span>)</span><br><span class="line">                .allowCredentials(<span class="keyword">true</span>)</span><br><span class="line">                .allowedMethods(<span class="string">"GET"</span>, <span class="string">"POST"</span>, <span class="string">"DELETE"</span>, <span class="string">"PUT"</span>)</span><br><span class="line">                .maxAge(<span class="number">3600</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="jsonp支持跨域"><a href="#jsonp支持跨域" class="headerlink" title="jsonp支持跨域"></a>jsonp支持跨域</h2><p>有前端经验的童鞋知道，有时我们会在自己的代码里直接引入其它域名的js、css等静态文件。为啥这些静态文件没被浏览器限制呢？通常为了减轻web服务器的压力，我们会把js、css，img等静态资源分离到另一台独立域名的服务器上，使其和前端分离开。基于这个原因，浏览器并没有限制这类静态资源的跨域访问。</p>
+<p>我们可以动态地创建一个script，让浏览器以为我们要获取静态资源，从而网开一面。而服务器端也需要做一点改变，不能直接返回json，而是返回一个立即执行的函数，而前端请求的结果就作为函数的参数。</p>
+<h3 id="后端接口返回"><a href="#后端接口返回" class="headerlink" title="后端接口返回"></a>后端接口返回</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ApplicationA</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(ApplicationA.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(<span class="string">"/test"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">test</span><span class="params">(HttpServletRequest request, HttpServletResponse response, String callback)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">        map.put(<span class="string">"success"</span>, <span class="keyword">true</span>);</span><br><span class="line">        map.put(<span class="string">"msg"</span>, <span class="string">"我来自服务端"</span>);</span><br><span class="line">        <span class="comment">// 返回值如下：</span></span><br><span class="line">        <span class="comment">// callback(&#123;"msg":"我来自服务端","success":true&#125;);</span></span><br><span class="line">        <span class="keyword">return</span> String.format(<span class="string">"%s(%s);"</span>, callback, JsonUtil.toJson(map));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h3 id="js原生实现jsonp"><a href="#js原生实现jsonp" class="headerlink" title="js原生实现jsonp"></a>js原生实现jsonp</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">test</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 外部域名，参数是和后端接口约定的callback指定接口返回后的回调函数</span></span><br><span class="line">    url = <span class="string">"http://localhost:8882/test?callback=_ajax_callback"</span>;</span><br><span class="line">    <span class="comment">// 创建一个script元素</span></span><br><span class="line">    <span class="keyword">var</span> script = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>);</span><br><span class="line">    script.type = <span class="string">'text/javascript'</span>;</span><br><span class="line">    script.src = url;</span><br><span class="line">    <span class="built_in">document</span>.head.appendChild(script);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 接口回调</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">_ajax_callback</span>(<span class="params">res</span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"被回调了"</span>);</span><br><span class="line">    <span class="built_in">console</span>.log(res);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接口返回：</p>
+<p><img src="/img/acao/jsonp返回.png" alt="jsonp返回"></p>
+<p>回调函数执行：</p>
+<p><img src="/img/acao/jsonp回调.png" alt="jsonp回调"></p>
+<h3 id="jQuery实现jsonp"><a href="#jQuery实现jsonp" class="headerlink" title="jQuery实现jsonp"></a>jQuery实现jsonp</h3><p>一般我们会使用jQuery来做ajax请求，这样需要增加一个jQuery的引用。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 没测，懒得测</span></span><br><span class="line">$.ajax(&#123;</span><br><span class="line">    url: <span class="string">'http://localhost:8882/test'</span>,</span><br><span class="line">    type: <span class="string">'get'</span>,</span><br><span class="line">    dataType: <span class="string">'jsonp'</span>,  <span class="comment">// 请求方式</span></span><br><span class="line">    jsonpCallback: <span class="string">"_ajax_callback"</span>,    <span class="comment">// 回调函数名</span></span><br><span class="line">    data: &#123;&#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="vue-js实现jsonp"><a href="#vue-js实现jsonp" class="headerlink" title="vue.js实现jsonp"></a>vue.js实现jsonp</h3><p>现在前端vue.js用的也很多，再记录一个vue.js的用法。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 没测，懒得测</span></span><br><span class="line"><span class="keyword">this</span>.$http.jsonp(<span class="string">'http://localhost:8882/test'</span>, &#123;</span><br><span class="line">    params: &#123;&#125;,</span><br><span class="line">    jsonp: <span class="string">'_ajax_callback'</span></span><br><span class="line">&#125;).then(<span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(res); </span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="jsonp缺点"><a href="#jsonp缺点" class="headerlink" title="jsonp缺点"></a>jsonp缺点</h3><p>只能实现get请求。</p>
+<h2 id="其它方式支持跨域"><a href="#其它方式支持跨域" class="headerlink" title="其它方式支持跨域"></a>其它方式支持跨域</h2><ul>
+<li>nginx反向代理：前端访问相同域名，nginx再根据需要把请求转发到外部域名；</li>
+<li>后端代理：在后端接口里先请求外部资源（比如用HttpClient），然后把结果返回给前端，这样就不是跨域了；</li>
+<li>气他：借住iframe、postMessage等也可实现跨域。</li>
+</ul>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/30/concurrent-thread-pool/" class="next-post btn btn-default" title='探索JAVA并发 - 线程池详解'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">探索JAVA并发 - 线程池详解</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#同源策略"><span class="toc-text">同源策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#跨域报错"><span class="toc-text">跨域报错</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#后端修改Response支持跨域"><span class="toc-text">后端修改Response支持跨域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#springboot支持跨域"><span class="toc-text">springboot支持跨域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#jsonp支持跨域"><span class="toc-text">jsonp支持跨域</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#后端接口返回"><span class="toc-text">后端接口返回</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#js原生实现jsonp"><span class="toc-text">js原生实现jsonp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jQuery实现jsonp"><span class="toc-text">jQuery实现jsonp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#vue-js实现jsonp"><span class="toc-text">vue.js实现jsonp</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#jsonp缺点"><span class="toc-text">jsonp缺点</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#其它方式支持跨域"><span class="toc-text">其它方式支持跨域</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号: 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
