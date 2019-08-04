@@ -231,7 +231,7 @@
 <li>int maximumPoolSize : 最大线程数，线程池最多拥有的线程数</li>
 <li>long keepAliveTime : 空闲线程存活时间</li>
 <li>TimeUnit unit : 空闲线程存活时间的单位</li>
-<li>BlockingQueue<runnable> workQueue : 存放待执行任务的阻塞队列，新任务来时，若当前线程数&gt;=最大核心线程数，则放到这个队列</runnable></li>
+<li>BlockingQueue<runnable> workQueue : 存放待执行任务的阻塞队列，新任务来时，若当前线程数&gt;=最大核心线程数，则放到这个队列(具体逻辑更复杂，请看下面源码分析)</runnable></li>
 <li>ThreadFactory threadFactory : 创建新线程的工厂，一般用来给线程取个名字方便排查问题</li>
 <li>RejectedExecutionHandler handler : 任务被拒绝后的处理器，默认的处理器会直接抛出异常，建议重新实现</li>
 </ul>
