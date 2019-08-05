@@ -33,7 +33,7 @@
     <!--Title-->
 
 
-<title>标签: filter | 一杯82年的JAVA</title>
+<title>标签: 锁 | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -152,7 +152,7 @@
     
     
         <li>
-            filter
+            锁
         </li>
     
     
@@ -165,21 +165,20 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
-                    <a href="/2018/11/29/acuprpc-4/">从0.5到1写个rpc框架 - 4:request filter</a>
+                    <a href="/2019/08/04/concurrent-lock-contention-reduce/">探索JAVA并发 - 如何减少锁的竞争</a>
                 </h1>
                 <div class="post-meta">  &bull;
                     <time class="post-date" datetime="" title="">
-                        2018年11月29日
+                        2019年08月04日
                     </time>
                 </div>
             </div>
             <p class="brief">
                 
                     
-这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+锁的竞争会限制代码的可伸缩性，在并发编程时通过一些手段有意地减少锁竞争，可以让程序有更好的表现。
 
-为了后续扩展方便，搞个filter支持，就抄一个servlet的filter吧。
-servlet filter 分析在写mvc项目时，经常会用到filter，...
+所谓可伸缩性，即当增加计算资源(如CPU、内存、带宽等)时，程序的吞吐量或处理能力会相应增加。这个时候，我们当然希望增加的效果越明显...
                 
             </p>
         </div>

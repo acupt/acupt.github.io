@@ -35,7 +35,7 @@ function _doGet(url, queryMap) {
             url += query;
         }
     }
-    url = "http://captcha.yidaren.top" + url;
+    url = "//captcha.yidaren.top" + url;
     console.log(url);
     var script = document.createElement('script');
     script.type = 'text/javascript';

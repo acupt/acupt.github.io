@@ -1,0 +1,366 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="线程,并发,锁" />
+
+
+    <meta name="description" content="
+锁的竞争会限制代码的可伸缩性，在并发编程时通过一些手段有意地减少锁竞争，可以让程序有更好的表现。
+
+所谓可伸缩性，即当增加计算资源(如CPU、内存、带宽等)时，程序的吞吐量或处理能力会相应增加..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>探索JAVA并发 - 如何减少锁的竞争 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="探索JAVA并发 - 如何减少锁的竞争">
+            
+	            探索JAVA并发 - 如何减少锁的竞争
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/并发/">并发</a> <a class="tag-link" href="/tags/线程/">线程</a> <a class="tag-link" href="/tags/锁/">锁</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/04</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>锁的竞争会限制代码的可伸缩性，在并发编程时通过一些手段有意地减少锁竞争，可以让程序有更好的表现。</p>
+</blockquote>
+<p>所谓可伸缩性，即当增加计算资源(如CPU、内存、带宽等)时，程序的吞吐量或处理能力会相应增加。这个时候，我们当然希望增加的效果越明显越好，不过如果锁竞争太严重，可伸缩性会大打折扣。</p>
+<h2 id="缩小锁的范围"><a href="#缩小锁的范围" class="headerlink" title="缩小锁的范围"></a>缩小锁的范围</h2><p>当某个方法需要操作一个线程不安全的共享资源时，最简单的办法就是给方法加上synchronized，这样一来这个方法只能同时有一个线程在执行，满满的安全感。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Counter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">incr</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"i will incr "</span> + n);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 这个小小的睡眠代表一些线程安全的操作</span></span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"i am ready"</span>);</span><br><span class="line">        value = value + n;</span><br><span class="line">        System.out.println(<span class="string">"i incr "</span> + n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述示例的同步方法中有个耗时1秒的准备过程，这个过程是线程安全，但由于身在同步方法中，众线程不得不排队睡觉。这时候不管增加多少个线程，程序该睡多久还是睡多久。若是把这个步骤从同步代码块中移除，大家就能并发睡觉。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Counter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">incr</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"i will incr "</span> + n);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"i am ready"</span>);</span><br><span class="line">        <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">            <span class="comment">// 只有这行代码是不能并发执行的</span></span><br><span class="line">            value = value + n;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(<span class="string">"i incr "</span> + n);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过上述示例就让线程在持有锁时需要执行的指令尽可能小，并发的效率更高了。</p>
+<p>但如果多个线程不安全的操作之间隔着一些安全的耗时操作，是分别使用同步块，还是用一个同步块，并不能说谁一定好。因为同步代码块也是有额外性能开销的，比起同步执行无关的操作，不一定划算，还是需要通过测试，用数据说话。</p>
+<h2 id="减小锁粒度-锁分解"><a href="#减小锁粒度-锁分解" class="headerlink" title="减小锁粒度 - 锁分解"></a>减小锁粒度 - 锁分解</h2><p>如果一个锁要用来保护多个相互独立的资源，可以考虑用多个锁分别保护某个资源，即锁分解。</p>
+<p>如此这般，就不用在只需要操作一个资源时，把其它不相干资源也卷入其中，导致其它想用资源的线程看着这个线程占着茅坑不拉屎（或者占着整个厕所更恰当？）。</p>
+<h3 id="使用一个锁保护多个资源"><a href="#使用一个锁保护多个资源" class="headerlink" title="使用一个锁保护多个资源"></a>使用一个锁保护多个资源</h3><p>下面这个示例，不管想操作哪个资源，都会把所有资源都锁住。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Counter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> src1;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> src2;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> src3;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">incr</span><span class="params">(<span class="keyword">int</span> src1, <span class="keyword">int</span> src2, <span class="keyword">int</span> src3)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.src1 += src1;</span><br><span class="line">        <span class="keyword">this</span>.src2 += src2;</span><br><span class="line">        <span class="keyword">this</span>.src3 += src3;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="一个锁保护一个资源"><a href="#一个锁保护一个资源" class="headerlink" title="一个锁保护一个资源"></a>一个锁保护一个资源</h3><p>通过锁分解，每个资源有它自己的锁，可以单独操作。如果想兼容旧代码也是可以的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Counter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> src1;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> src2;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> src3;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 兼容旧代码，不用修改调用的地方</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">incr</span><span class="params">(<span class="keyword">int</span> src1, <span class="keyword">int</span> src2, <span class="keyword">int</span> src3)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (src1 != <span class="number">0</span>) &#123;</span><br><span class="line">            incrSrc1(src1);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (src2 != <span class="number">0</span>) &#123;</span><br><span class="line">            incrSrc2(src2);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (src3 != <span class="number">0</span>) &#123;</span><br><span class="line">            incrSrc3(src3);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">incrSrc1</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.src1 += n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">incrSrc2</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.src2 += n;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">incrSrc3</span><span class="params">(<span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.src3 += n;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="减小锁粒度-锁分段"><a href="#减小锁粒度-锁分段" class="headerlink" title="减小锁粒度 - 锁分段"></a>减小锁粒度 - 锁分段</h2><p>锁分段是锁分解的进一步扩展，对于一组资源集合，可以把资源分为多个小组，每个小组用一个锁来保护，比如我们熟知的ConcurrentHashMap(java8中已经不再使用分段锁了，改为synchronized + cas)。</p>
+<p>用的java8，不能分析一波ConcurrentHashMap的分段锁了，写个例子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Counter</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] src;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Object[] locks;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nSrc   资源数量</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> nLocks 分成几段锁</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Counter</span><span class="params">(<span class="keyword">int</span> nSrc, <span class="keyword">int</span> nLocks)</span> </span>&#123;</span><br><span class="line">        src = <span class="keyword">new</span> <span class="keyword">int</span>[nSrc];</span><br><span class="line">        locks = <span class="keyword">new</span> Object[nLocks];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nLocks; i++) &#123;</span><br><span class="line">            locks[i] = <span class="keyword">new</span> Object();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> idx 要访问的资源序号</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> n   增量</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">incr</span><span class="params">(<span class="keyword">int</span> idx, <span class="keyword">int</span> n)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 根据一定规则（比如hash）找到目标资源归谁管</span></span><br><span class="line">        Object lock = locks[idx % locks.length];</span><br><span class="line">        <span class="keyword">synchronized</span> (lock) &#123;</span><br><span class="line">            src[idx] += n;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="避免热点域"><a href="#避免热点域" class="headerlink" title="避免热点域"></a>避免热点域</h2><h2 id="替代独占锁"><a href="#替代独占锁" class="headerlink" title="替代独占锁"></a>替代独占锁</h2><h2 id="检测CPU利用率"><a href="#检测CPU利用率" class="headerlink" title="检测CPU利用率"></a>检测CPU利用率</h2><h2 id="不使用对象池"><a href="#不使用对象池" class="headerlink" title="不使用对象池"></a>不使用对象池</h2><blockquote>
+<p>参考书籍: 《Java并发编程实战》</p>
+</blockquote>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/07/31/access-control-allow-origin/" class="next-post btn btn-default" title='跨域Access-Control-Allow-Origin解决方案'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">跨域Access-Control-Allow-Origin解决方案</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#缩小锁的范围"><span class="toc-text">缩小锁的范围</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#减小锁粒度-锁分解"><span class="toc-text">减小锁粒度 - 锁分解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#使用一个锁保护多个资源"><span class="toc-text">使用一个锁保护多个资源</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#一个锁保护一个资源"><span class="toc-text">一个锁保护一个资源</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#减小锁粒度-锁分段"><span class="toc-text">减小锁粒度 - 锁分段</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#避免热点域"><span class="toc-text">避免热点域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#替代独占锁"><span class="toc-text">替代独占锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检测CPU利用率"><span class="toc-text">检测CPU利用率</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不使用对象池"><span class="toc-text">不使用对象池</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号: 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
