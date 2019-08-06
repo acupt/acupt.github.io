@@ -165,6 +165,201 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
+                    <a href="/2019/07/13/acuprpc-7/">从0.5到1写个rpc框架 - 7:网关支持(gateway)</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2019年07月13日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+微服务除了在内部相互调用，有时某些服务也会提供给外部应用。当然不能让外部应用也加入到“大家庭”里，毕竟知人知面不知源码，我们可以派出一个“前台”去接待它们，这...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2019/07/13/acuprpc-6/">从0.5到1写个rpc框架 - 6:调用异常节点自动重试</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2019年07月13日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+eureka client每隔30s向注册中心发送心跳来给自己续命，当注册中心长时间没收到client的信号，就会认为它挂掉了，把它提出群聊。再加上其它服务也...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/11/29/acuprpc-5/">从0.5到1写个rpc框架 - 5:服务监控和管理(actuator)</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年11月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+springboot项目中只要引入spring-boot-starter-actuator就可以得到一些管理服务的接口，比如停止服务，获取服务信息等。他用的并...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/11/29/acuprpc-4/">从0.5到1写个rpc框架 - 4:request filter</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年11月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+为了后续扩展方便，搞个filter支持，就抄一个servlet的filter吧。
+servlet filter 分析在写mvc项目时，经常会用到filter，...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/11/29/acuprpc-3/">从0.5到1写个rpc框架 - 3:远程服务调用(thrift)</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年11月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+thrift是Facebook开源的rpc框架，基于TPC，默认使用二进制。
+需要先掌握thrift的基本用法: thrift-Java 示例
+项目结构123...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/11/29/acuprpc-2/">从0.5到1写个rpc框架 - 2:远程服务调用(grpc)</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年11月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+gRPC是Google开源的跨语言远程服务调用(RPC)框架，通信协议用的HTTP/2，数据传输默认用的protocol buffers（一种轻便高效的结构化...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/11/29/acuprpc-1/">从0.5到1写个rpc框架 - 1:服务注册/发现(eureka)</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年11月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+123- acuprpc    + acuprpc-core  //server/client核心处理逻辑    + acuprpc-spring-boot-...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/11/29/acuprpc-0/">从0.5到1写个rpc框架 - 0:前言</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年11月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    
+这不是教程，只是个人总结，有兴趣的童鞋可以搭配源码看看：acuprpc
+
+最近在新公司开始接触微服务，在此之前并没有微服务的开发经验。对比了spring cloud和公司的rpc框架，对微服务这套东西终于有了一点粗浅的认知，为了加深...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
                     <a href="/2018/11/15/spring-rabbitmq-retry/">spring rabbitmq 异常重试源码分析</a>
                 </h1>
                 <div class="post-meta">  &bull;
@@ -176,6 +371,28 @@
             <p class="brief">
                 
                     springboot集成rabbitMQ发消息123456789@Resourceprivate RabbitTemplate rabbitTemplate;@Value(&#34;$&amp;#123;my.exchange&amp;#125;&#34;)pri...
+                
+            </p>
+        </div>
+    </article>
+ 
+    <article class="post">
+        
+        <div class="post-content">
+            <div class="post-head home-post-head">
+                <h1 class="post-title">
+                    <a href="/2018/10/29/spring-cloud-source-diy/">spring cloud 自定义配置源及配置刷新</a>
+                </h1>
+                <div class="post-meta">  &bull;
+                    <time class="post-date" datetime="" title="">
+                        2018年10月29日
+                    </time>
+                </div>
+            </div>
+            <p class="brief">
+                
+                    通过自定义配置源可以接入自己的配置服务，配合ContextRefresher可以让应用运行中自动更新配置。
+实现PropertySourceLocator123456789101112131415161718/** * 自定义配置源 ...
                 
             </p>
         </div>
@@ -275,7 +492,7 @@
     <h3 class="title">标签云</h3>
     <div class="content tag-cloud">
         
-            <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/cpu/" style="font-size: 10px;">cpu</a> <a href="/tags/eureka/" style="font-size: 16px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/github/" style="font-size: 12px;">github</a> <a href="/tags/grpc/" style="font-size: 14px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jvm/" style="font-size: 14px;">jvm</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/oom/" style="font-size: 10px;">oom</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 14px;">rpc</a> <a href="/tags/spring/" style="font-size: 10px;">spring</a> <a href="/tags/thrift/" style="font-size: 14px;">thrift</a> <a href="/tags/同步/" style="font-size: 10px;">同步</a> <a href="/tags/并发/" style="font-size: 14px;">并发</a> <a href="/tags/微服务/" style="font-size: 20px;">微服务</a> <a href="/tags/死锁/" style="font-size: 10px;">死锁</a> <a href="/tags/泛型/" style="font-size: 10px;">泛型</a> <a href="/tags/类型擦除/" style="font-size: 10px;">类型擦除</a> <a href="/tags/线程/" style="font-size: 18px;">线程</a> <a href="/tags/线程池/" style="font-size: 10px;">线程池</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a> <a href="/tags/锁/" style="font-size: 10px;">锁</a>
+            <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/cpu/" style="font-size: 10px;">cpu</a> <a href="/tags/eureka/" style="font-size: 15px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/github/" style="font-size: 11.67px;">github</a> <a href="/tags/grpc/" style="font-size: 13.33px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jvm/" style="font-size: 13.33px;">jvm</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/oom/" style="font-size: 10px;">oom</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 13.33px;">rpc</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/thrift/" style="font-size: 13.33px;">thrift</a> <a href="/tags/同步/" style="font-size: 10px;">同步</a> <a href="/tags/并发/" style="font-size: 13.33px;">并发</a> <a href="/tags/微服务/" style="font-size: 18.33px;">微服务</a> <a href="/tags/死锁/" style="font-size: 10px;">死锁</a> <a href="/tags/泛型/" style="font-size: 10px;">泛型</a> <a href="/tags/类型擦除/" style="font-size: 10px;">类型擦除</a> <a href="/tags/线程/" style="font-size: 16.67px;">线程</a> <a href="/tags/线程池/" style="font-size: 10px;">线程池</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a> <a href="/tags/锁/" style="font-size: 10px;">锁</a>
         
     </div>
   </div>

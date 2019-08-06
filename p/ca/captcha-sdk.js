@@ -62,9 +62,8 @@ function _afterGetImg(res) {
         '               <img id="ggdoor_bg_patch" class="ggdoor_bg_patch">\n' +
         '           </div>\n' +
         '           <div id="ggdoor_tips" class="ggdoor_tips">\n' +
-        '               <div id="ggdoor_slider" class="ggdoor_slider"><span\n' +
-        '                                        class="ggdoor_slider_icon"></span>' +
-        '               </div>\n' +
+        '               <div id="ggdoor_slider" class="ggdoor_slider"><span\n' +="" '="" class="ggdoor_slider_icon">' +
+        '               </span\n'></div>\n' +
         '           </div>\n' +
         '      </div>\n' +
         '   </div>\n' +
