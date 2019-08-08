@@ -161,9 +161,69 @@
 
 <article class="post">
     
+    <div class="post-content">
+        <div class="post-head home-post-head">
+            <h1 class="post-title">
+                <a href="/2019/08/08/concurrent-lock-reentrant/">探索JAVA并发 - 可重入锁和不可重入锁</a>
+            </h1>
+            <div class="post-meta">  &bull;
+                <time class="post-date" datetime="" title="">
+                    2019年08月08日
+                </time>
+            </div>
+        </div>
+        <p class="brief">
+            
+                
+什么是可重入，什么是不可重入，它们又是如何实现的？
+
+定义
+可重入锁：当线程获取某个锁后，还可以继续获取它，可以递归调用，而不会发生死锁；
+不可重入锁：与可重入相反，获取锁后不能重复获取，否则会死锁（自己锁自己）。
+
+不可重入锁用代...
+            
+        </p>
+    </div>
+    
+        <footer class="post-footer clearfix">
+            <div class="pull-left tag-list">
+                <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/并发/">并发</a> <a class="tag-link" href="/tags/锁/">锁</a>
+                
+            </span>
+        </span>
+    
+
+    
+</div>
+            </div>
+
+            <div class="post-permalink">
+                <a href="/2019/08/08/concurrent-lock-reentrant/" class="btn btn-default">阅读全文</a>
+            </div>
+        </footer>
+    
+</article>
+
+
+<article class="post">
+    
         <div class="post-media">
             <a href="/2019/08/04/concurrent-lock-contention-reduce/">
-                <img class="img-ajax" src="/img/loading.gif"  data-src="/img/emoji/磨洋工.gif"   alt="探索JAVA并发 - 如何减少锁的竞争">
+                <img class="img-ajax" src="/img/loading.gif"  data-src="/img/emoji/一人干活多人围观.jpeg"   alt="探索JAVA并发 - 如何减少锁的竞争">
             </a>
         </div>
     
@@ -688,62 +748,6 @@ JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关�
 </article>
 
 
-<article class="post">
-    
-    <div class="post-content">
-        <div class="post-head home-post-head">
-            <h1 class="post-title">
-                <a href="/2019/07/21/deadlock/">死锁的四大条件与处理策略</a>
-            </h1>
-            <div class="post-meta">  &bull;
-                <time class="post-date" datetime="" title="">
-                    2019年07月21日
-                </time>
-            </div>
-        </div>
-        <p class="brief">
-            
-                
-死锁是指两个或两个以上的进程在执行过程中，由于竞争资源或者由于彼此通信而造成的一种阻塞的现象，若无外力作用，它们都将无法推进下去。此时称系统处于死锁状态或系统产生了死锁，这些永远在互相等待的进程称为死锁进程。
-
-比如：两个线程A、B...
-            
-        </p>
-    </div>
-    
-        <footer class="post-footer clearfix">
-            <div class="pull-left tag-list">
-                <div class="post-meta">
-    
-        <span class="categories-meta fa-wrap">
-            <i class="fa fa-folder-open-o"></i>
-            <a class="category-link" href="/categories/面试杂谈/">面试杂谈</a>
-        </span>
-    
-
-    
-        <span class="fa-wrap">
-            <i class="fa fa-tags"></i>
-            <span class="tags-meta">
-                
-                    <a class="tag-link" href="/tags/死锁/">死锁</a>
-                
-            </span>
-        </span>
-    
-
-    
-</div>
-            </div>
-
-            <div class="post-permalink">
-                <a href="/2019/07/21/deadlock/" class="btn btn-default">阅读全文</a>
-            </div>
-        </footer>
-    
-</article>
-
-
 
 
     <nav class="pagination" role="navigation">
@@ -823,7 +827,7 @@ JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关�
         
     <div class="widget">
         <h3 class="title">分类</h3>
-        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/"><i class="fa" aria-hidden="true">JAVA</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实践笔记/"><i class="fa" aria-hidden="true">实践笔记</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发编程/"><i class="fa" aria-hidden="true">并发编程</i></a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务/"><i class="fa" aria-hidden="true">微服务</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/"><i class="fa" aria-hidden="true">随笔</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/面试杂谈/"><i class="fa" aria-hidden="true">面试杂谈</i></a><span class="category-list-count">4</span></li></ul>
+        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/"><i class="fa" aria-hidden="true">JAVA</i></a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实践笔记/"><i class="fa" aria-hidden="true">实践笔记</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发编程/"><i class="fa" aria-hidden="true">并发编程</i></a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务/"><i class="fa" aria-hidden="true">微服务</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/"><i class="fa" aria-hidden="true">随笔</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/面试杂谈/"><i class="fa" aria-hidden="true">面试杂谈</i></a><span class="category-list-count">4</span></li></ul>
     </div>
 
 
@@ -831,7 +835,7 @@ JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关�
         
     <div class="widget">
         <h3 class="title">归档</h3>
-        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">2</span></li></ul>
+        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">2</span></li></ul>
     </div>
 
 
@@ -841,7 +845,7 @@ JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关�
     <h3 class="title">标签云</h3>
     <div class="content tag-cloud">
         
-            <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/cpu/" style="font-size: 10px;">cpu</a> <a href="/tags/eureka/" style="font-size: 15px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/github/" style="font-size: 11.67px;">github</a> <a href="/tags/grpc/" style="font-size: 13.33px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jvm/" style="font-size: 13.33px;">jvm</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/oom/" style="font-size: 10px;">oom</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 13.33px;">rpc</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/thrift/" style="font-size: 13.33px;">thrift</a> <a href="/tags/同步/" style="font-size: 10px;">同步</a> <a href="/tags/并发/" style="font-size: 13.33px;">并发</a> <a href="/tags/微服务/" style="font-size: 18.33px;">微服务</a> <a href="/tags/死锁/" style="font-size: 10px;">死锁</a> <a href="/tags/泛型/" style="font-size: 10px;">泛型</a> <a href="/tags/类型擦除/" style="font-size: 10px;">类型擦除</a> <a href="/tags/线程/" style="font-size: 16.67px;">线程</a> <a href="/tags/线程池/" style="font-size: 10px;">线程池</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a> <a href="/tags/锁/" style="font-size: 10px;">锁</a>
+            <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/cpu/" style="font-size: 10px;">cpu</a> <a href="/tags/eureka/" style="font-size: 15px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/github/" style="font-size: 11.67px;">github</a> <a href="/tags/grpc/" style="font-size: 13.33px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jvm/" style="font-size: 13.33px;">jvm</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/oom/" style="font-size: 10px;">oom</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 13.33px;">rpc</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/thrift/" style="font-size: 13.33px;">thrift</a> <a href="/tags/同步/" style="font-size: 10px;">同步</a> <a href="/tags/并发/" style="font-size: 15px;">并发</a> <a href="/tags/微服务/" style="font-size: 18.33px;">微服务</a> <a href="/tags/死锁/" style="font-size: 10px;">死锁</a> <a href="/tags/泛型/" style="font-size: 10px;">泛型</a> <a href="/tags/类型擦除/" style="font-size: 10px;">类型擦除</a> <a href="/tags/线程/" style="font-size: 16.67px;">线程</a> <a href="/tags/线程池/" style="font-size: 10px;">线程池</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a> <a href="/tags/锁/" style="font-size: 11.67px;">锁</a>
         
     </div>
   </div>

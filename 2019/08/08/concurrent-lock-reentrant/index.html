@@ -1,0 +1,370 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="并发,锁" />
+
+
+    <meta name="description" content="
+什么是可重入，什么是不可重入，它们又是如何实现的？
+
+定义
+可重入锁：当线程获取某个锁后，还可以继续获取它，可以递归调用，而不会发生死锁；
+不可重入锁：与可重入相反，获取锁后不能重复获取，否则..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>探索JAVA并发 - 可重入锁和不可重入锁 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="探索JAVA并发 - 可重入锁和不可重入锁">
+            
+	            探索JAVA并发 - 可重入锁和不可重入锁
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/并发/">并发</a> <a class="tag-link" href="/tags/锁/">锁</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/08</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>什么是可重入，什么是不可重入，它们又是如何实现的？</p>
+</blockquote>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><ul>
+<li>可重入锁：当线程获取某个锁后，还可以继续获取它，可以递归调用，而不会发生死锁；</li>
+<li>不可重入锁：与可重入相反，获取锁后不能重复获取，否则会死锁（自己锁自己）。</li>
+</ul>
+<h2 id="不可重入锁"><a href="#不可重入锁" class="headerlink" title="不可重入锁"></a>不可重入锁</h2><p>用代码说话。</p>
+<h3 id="基于-wait-notify-实现不可重入锁"><a href="#基于-wait-notify-实现不可重入锁" class="headerlink" title="基于 wait/notify 实现不可重入锁"></a>基于 wait/notify 实现不可重入锁</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 不可重入锁</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReentrantForbiddenLock</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Thread owner;<span class="comment">// 持有锁的线程，为空表示无人占有</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取锁，锁被占用时阻塞直到锁被释放</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> InterruptedException 等待锁时线程被中断</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Thread thread = Thread.currentThread();</span><br><span class="line">        <span class="comment">// wait()方法一般和while一起使用，防止因其它原因唤醒而实际没达到期望的条件</span></span><br><span class="line">        <span class="keyword">while</span> (owner != <span class="keyword">null</span>) &#123;</span><br><span class="line">            System.out.println(String.format(<span class="string">"%s 等待 %s 释放锁"</span>, </span><br><span class="line">                thread.getName(), owner.getName()));</span><br><span class="line">            wait(); <span class="comment">// 阻塞，直到被唤起</span></span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(thread.getName() + <span class="string">" 获得了锁"</span>);</span><br><span class="line">        owner = thread;<span class="comment">//成功上位</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">//只有持有锁的线程才有资格释放锁，别的线程不能强迫它</span></span><br><span class="line">        <span class="keyword">if</span> (Thread.currentThread() != owner) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalMonitorStateException();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(owner.getName() + <span class="string">" 释放了持有的锁"</span>);</span><br><span class="line">        owner = <span class="keyword">null</span>;</span><br><span class="line">        notify();<span class="comment">//唤醒一个等待锁的线程，也可以用notifyAll()</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        ReentrantForbiddenLock lock = <span class="keyword">new</span> ReentrantForbiddenLock();</span><br><span class="line">        lock.lock(); <span class="comment">// 获取锁</span></span><br><span class="line">        lock.lock(); <span class="comment">// 还想再来一次</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment">main 获得了锁</span></span><br><span class="line"><span class="comment">main 等待 main 释放锁</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>第二次调用lock后线程就阻塞了，线程开始等待持有锁的线程放手，然而是它是它就是它。</p>
+<h3 id="基于自旋锁实现不可重入锁"><a href="#基于自旋锁实现不可重入锁" class="headerlink" title="基于自旋锁实现不可重入锁"></a>基于自旋锁实现不可重入锁</h3><p>自旋锁，即获取锁的线程在锁被占用时，不是阻塞，而是不断循环去尝试，直到获取锁。</p>
+<ul>
+<li>好处：线程保持活跃，减少了线程切换的开销</li>
+<li>缺点：很消耗CPU，特别是等待时间很长时</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicReference;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 不可重入锁</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReentrantForbiddenLock</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 原子引用：持有锁的线程，为空表示无人占有</span></span><br><span class="line">    <span class="keyword">private</span> AtomicReference&lt;Thread&gt; owner = <span class="keyword">new</span> AtomicReference&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取锁，锁被占用时阻塞直到锁被释放</span></span><br><span class="line"><span class="comment">     * 使用CAS原子操作，不用synchronized同步了</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Thread thread = Thread.currentThread();</span><br><span class="line">        <span class="comment">// compareAndSet: 原子操作，依赖操作系统底层实现</span></span><br><span class="line">        <span class="comment">// 如果当前持有值为null，则替换为thread，并返回true，否则返回false</span></span><br><span class="line">        <span class="keyword">while</span> (!owner.compareAndSet(<span class="keyword">null</span>, thread)) &#123;</span><br><span class="line">            <span class="comment">// 真正用时可不敢这样打印，那输出太多了</span></span><br><span class="line">            System.out.println(String.format(<span class="string">"%s 等待 %s 释放锁"</span>,</span><br><span class="line">                thread.getName(), owner.get().getName()));</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(thread.getName() + <span class="string">" 获得了锁"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Thread thread = Thread.currentThread();</span><br><span class="line">        <span class="keyword">if</span> (owner.compareAndSet(thread, <span class="keyword">null</span>)) &#123;</span><br><span class="line">            System.out.println(thread.getName() + <span class="string">" 释放了锁"</span>);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//只有持有锁的线程才有资格释放锁，别的线程不能强迫它</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalMonitorStateException();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        ReentrantForbiddenLock lock = <span class="keyword">new</span> ReentrantForbiddenLock();</span><br><span class="line">        lock.lock();</span><br><span class="line">        lock.lock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">main 获得了锁</span></span><br><span class="line"><span class="comment">main 等待 main 释放锁</span></span><br><span class="line"><span class="comment">main 等待 main 释放锁</span></span><br><span class="line"><span class="comment">main 等待 main 释放锁</span></span><br><span class="line"><span class="comment">...</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>如果不想磁盘爆掉，不要在自旋过程中随便打印日志😈</p>
+<h2 id="可重入锁"><a href="#可重入锁" class="headerlink" title="可重入锁"></a>可重入锁</h2><p>不可重入锁扩展一下，增加一个计数器，同一个线程每次获取锁计数器加1，释放锁减1，为0时释放锁。</p>
+<h3 id="基于自旋锁实现可重入锁"><a href="#基于自旋锁实现可重入锁" class="headerlink" title="基于自旋锁实现可重入锁"></a>基于自旋锁实现可重入锁</h3><p>直接用上个例子的代码改一下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicReference;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 不可重入锁</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReentrantForbiddenLock</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 原子引用：持有锁的线程，为空表示无人占有</span></span><br><span class="line">    <span class="keyword">private</span> AtomicReference&lt;Thread&gt; owner = <span class="keyword">new</span> AtomicReference&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 计数器</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> count;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取锁，锁被占用时阻塞直到锁被释放</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Thread thread = Thread.currentThread();</span><br><span class="line">        <span class="keyword">if</span> (thread == owner.get()) &#123;</span><br><span class="line">            count++;</span><br><span class="line">            System.out.println(thread.getName() + <span class="string">" 再次获得了锁， count = "</span> + count);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// compareAndSet: 原子操作，依赖操作系统底层实现</span></span><br><span class="line">        <span class="comment">// 如果当前持有值为null，则替换为thread，并返回true，否则返回false</span></span><br><span class="line">        <span class="keyword">while</span> (!owner.compareAndSet(<span class="keyword">null</span>, thread)) &#123;</span><br><span class="line">            <span class="comment">// 真正用时可不敢这样打印，那输出太多了</span></span><br><span class="line">            System.out.println(String.format(<span class="string">"%s 等待 %s 释放锁"</span>,</span><br><span class="line">                    thread.getName(), owner.get().getName()));</span><br><span class="line">        &#125;</span><br><span class="line">        count = <span class="number">1</span>;<span class="comment">//为了便于理解初始化为1</span></span><br><span class="line">        System.out.println(thread.getName() + <span class="string">" 获得了锁"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Thread thread = Thread.currentThread();</span><br><span class="line">        <span class="keyword">if</span> (thread == owner.get()) &#123;</span><br><span class="line">            count--;</span><br><span class="line">            System.out.println(thread.getName() + <span class="string">" 释放了锁，count = "</span> + count);</span><br><span class="line">            <span class="keyword">if</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">                owner.set(<span class="keyword">null</span>);</span><br><span class="line">                System.out.println(thread.getName() + <span class="string">" 彻底释放了锁"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//只有持有锁的线程才有资格释放锁，别的线程不能强迫它</span></span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalMonitorStateException();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        ReentrantForbiddenLock lock = <span class="keyword">new</span> ReentrantForbiddenLock();</span><br><span class="line">        lock.lock();</span><br><span class="line">        lock.lock();</span><br><span class="line">        lock.unlock();</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">main 获得了锁</span></span><br><span class="line"><span class="comment">main 再次获得了锁， count = 2</span></span><br><span class="line"><span class="comment">main 释放了锁，count = 1</span></span><br><span class="line"><span class="comment">main 释放了锁，count = 0</span></span><br><span class="line"><span class="comment">main 彻底释放了锁</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="可重入锁-synchronized"><a href="#可重入锁-synchronized" class="headerlink" title="可重入锁 synchronized"></a>可重入锁 synchronized</h3><p>没错，用于声明同步方法/代码块的synchronized关键字提供的也是一个可重入锁。</p>
+<p>同步方法递归测试：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            lock(<span class="number">5</span>);</span><br><span class="line">        &#125;).start();</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        System.out.println(<span class="string">"我是主线程，我也要来"</span>);</span><br><span class="line">        lock(<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">lock</span><span class="params">(<span class="keyword">int</span> count)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (count == <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(Thread.currentThread().getName() + <span class="string">" "</span> + count);</span><br><span class="line">        lock(count - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Thread-0 5</span></span><br><span class="line"><span class="comment">我是主线程，我也要来</span></span><br><span class="line"><span class="comment">Thread-0 4</span></span><br><span class="line"><span class="comment">Thread-0 3</span></span><br><span class="line"><span class="comment">Thread-0 2</span></span><br><span class="line"><span class="comment">Thread-0 1</span></span><br><span class="line"><span class="comment">main 2</span></span><br><span class="line"><span class="comment">main 1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h3 id="可重入锁-ReentrantLock"><a href="#可重入锁-ReentrantLock" class="headerlink" title="可重入锁 ReentrantLock"></a>可重入锁 ReentrantLock</h3><p>ReentrantLock是Java中很常见的工具类， 从名字就可以看出，它是个可重入锁，用法也很简单：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.locks.ReentrantLock;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">// 构造函数可传入一个布尔，表示是否使用公平锁(公平锁是什么？请听下回分解)</span></span><br><span class="line">        ReentrantLock lock = <span class="keyword">new</span> ReentrantLock(<span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            lock.lock();</span><br><span class="line">            System.out.println(<span class="string">"A 获取了锁"</span>);</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println(<span class="string">"A 释放了锁"</span>);</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;).start();</span><br><span class="line">        <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">            System.out.println(<span class="string">"B 等待锁"</span>);</span><br><span class="line">            lock.lock();</span><br><span class="line">            System.out.println(<span class="string">"B 获取了锁"</span>);</span><br><span class="line">            lock.unlock();</span><br><span class="line">            System.out.println(<span class="string">"B 释放了锁"</span>);</span><br><span class="line">        &#125;).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">A 获取了锁</span></span><br><span class="line"><span class="comment">B 等待锁</span></span><br><span class="line"><span class="comment">A 释放了锁</span></span><br><span class="line"><span class="comment">B 获取了锁</span></span><br><span class="line"><span class="comment">B 释放了锁</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/08/04/concurrent-lock-contention-reduce/" class="next-post btn btn-default" title='探索JAVA并发 - 如何减少锁的竞争'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">探索JAVA并发 - 如何减少锁的竞争</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#定义"><span class="toc-text">定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不可重入锁"><span class="toc-text">不可重入锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基于-wait-notify-实现不可重入锁"><span class="toc-text">基于 wait/notify 实现不可重入锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于自旋锁实现不可重入锁"><span class="toc-text">基于自旋锁实现不可重入锁</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#可重入锁"><span class="toc-text">可重入锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基于自旋锁实现可重入锁"><span class="toc-text">基于自旋锁实现可重入锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#可重入锁-synchronized"><span class="toc-text">可重入锁 synchronized</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#可重入锁-ReentrantLock"><span class="toc-text">可重入锁 ReentrantLock</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号 ~ 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
