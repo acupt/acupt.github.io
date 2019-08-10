@@ -1,0 +1,395 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.github.io">
+    <!--SEO-->
+
+    <meta name="keywords" content="并发,锁" />
+
+
+    <meta name="description" content="
+什么是悲观锁，什么是乐观锁，它们是如何实现的？
+
+定义
+悲观锁：对世界充满不信任，认为一定会发生冲突，因此在使用资源前先将其锁住，具有强烈的独占和排他特性。
+乐观锁：相信世界是和谐的，认为接下..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+
+    <!--Title-->
+
+
+<title>探索JAVA并发 - 悲观锁和乐观锁 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.github.io">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="探索JAVA并发 - 悲观锁和乐观锁">
+            
+	            探索JAVA并发 - 悲观锁和乐观锁
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/并发/">并发</a> <a class="tag-link" href="/tags/锁/">锁</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/10</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>什么是悲观锁，什么是乐观锁，它们是如何实现的？</p>
+</blockquote>
+<h2 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h2><ul>
+<li>悲观锁：对世界充满不信任，认为一定会发生冲突，因此在使用资源前先将其锁住，具有强烈的独占和排他特性。</li>
+<li>乐观锁：相信世界是和谐的，认为接下来的操作不会和别人发生冲突，因此不会上锁，直接进行计算，但在更新时还是会判断下这期间是否有人更新过(该有的谨慎还是不能少)，再决定是重新计算还是更新。</li>
+</ul>
+<h2 id="悲观锁"><a href="#悲观锁" class="headerlink" title="悲观锁"></a>悲观锁</h2><p>悲观锁认为一定会有人和它同时访问目标资源，因此必须先将其锁定，常见的synchronized和ReentrantLock等独占锁就是悲观锁思想的实现。</p>
+<p>举个简单的例子感受一下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// java提供的一个可以进行原子操作的类，对它进行加减不会受多线程影响</span></span><br><span class="line">    <span class="comment">// 虽然这里实际上用不到</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> AtomicInteger count = <span class="keyword">new</span> AtomicInteger();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(() -&gt; &#123;</span><br><span class="line">                <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                    System.out.println(Thread.currentThread().getName() + <span class="string">" waiting"</span>);</span><br><span class="line">                    visit();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;).start();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">visit</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName()</span><br><span class="line">                + <span class="string">" is coming, count = "</span> + count.incrementAndGet());</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep((<span class="keyword">long</span>) (Math.random() * <span class="number">5000</span>));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        count.decrementAndGet();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">Thread-0 waiting</span></span><br><span class="line"><span class="comment">Thread-0 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-1 waiting</span></span><br><span class="line"><span class="comment">Thread-2 waiting</span></span><br><span class="line"><span class="comment">Thread-3 waiting</span></span><br><span class="line"><span class="comment">Thread-4 waiting</span></span><br><span class="line"><span class="comment">Thread-0 waiting</span></span><br><span class="line"><span class="comment">Thread-4 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-4 waiting</span></span><br><span class="line"><span class="comment">Thread-3 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-3 waiting</span></span><br><span class="line"><span class="comment">Thread-2 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-2 waiting</span></span><br><span class="line"><span class="comment">Thread-1 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-2 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-1 waiting</span></span><br><span class="line"><span class="comment">Thread-2 waiting</span></span><br><span class="line"><span class="comment">Thread-3 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-3 waiting</span></span><br><span class="line"><span class="comment">Thread-4 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-4 waiting</span></span><br><span class="line"><span class="comment">Thread-0 is coming, count = 1</span></span><br><span class="line"><span class="comment">Thread-0 waiting</span></span><br><span class="line"><span class="comment">Thread-4 is coming, count = 1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>从输出可以看到，每次有线程访问这个资源(方法)时，count都是1，也就是说只有一个线程在访问它，这个线程在访问前先锁定了资源，导致其他线程只能等待。</p>
+<h2 id="乐观锁"><a href="#乐观锁" class="headerlink" title="乐观锁"></a>乐观锁</h2><p>乐观锁总是假设会遇到最好的情况，即这个资源除了我没人感兴趣，没人和我抢。虽然理想是美好的，但现实往往是残酷的，所以也不能盲目乐观，还是需要保证并发操作时不会对资源造成错误影响。可以使用版本号机制和CAS算法实现。</p>
+<h3 id="版本号机制"><a href="#版本号机制" class="headerlink" title="版本号机制"></a>版本号机制</h3><p>常用于数据库的版本控制中，即每个数据版本有个版本号字段，每次数据被修改，版本号就会增加。</p>
+<p>当一个操作要更新一个数据时，先读取当前版本号并记录，然后修改数据，在提交更新时检测版本号是否变化，如果没变化就应用更新，变化了就重试更新。</p>
+<h3 id="CAS算法"><a href="#CAS算法" class="headerlink" title="CAS算法"></a>CAS算法</h3><p>Compare-And-Swap，比较并交换。</p>
+<p>这种算法一般接收两个参数：预估值(expectedValue)和更新值(newValue)，返回一个布尔值（是否更新成功）。如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">compareAndSwap</span><span class="params">(<span class="keyword">int</span> expectedValue,<span class="keyword">int</span> newValue)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>实现逻辑为，将预估值(expectedValue)和真实值(realValue)比较，如果相同，则把真实值(realValue)修改为更新值(newValue)，返回true，否则返回false。</p>
+<p>使用Java代码模拟CAS实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CASer</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 真实值</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> realValue;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> realValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 自增指定值并获取自增后的值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">int</span> <span class="title">addAndGet</span><span class="params">(<span class="keyword">int</span> increment)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 不断CAS直到更新成功</span></span><br><span class="line">        <span class="comment">// 经常在源码中看到的是for(;;)这种写法，一种说法是两者编译出来的指令不同</span></span><br><span class="line">        <span class="comment">// for(;;)编译后指令更简单更快</span></span><br><span class="line">        <span class="comment">// 如果不是对性能很敏感随意就好，另外有的编译器可能会在编译时帮你优化成最佳指令</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">int</span> expectedValue = get();</span><br><span class="line">            <span class="keyword">int</span> newValue = expectedValue + increment;</span><br><span class="line">            <span class="keyword">if</span> (compareAndSwap(expectedValue, newValue)) &#123;</span><br><span class="line">                <span class="keyword">return</span> newValue;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// CAS</span></span><br><span class="line">    <span class="comment">// 如果当前值是expectedValue，则替换成newValue</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">boolean</span> <span class="title">compareAndSwap</span><span class="params">(<span class="keyword">int</span> expectedValue, <span class="keyword">int</span> newValue)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (expectedValue == realValue) &#123;</span><br><span class="line">            realValue = newValue;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>为了模拟CAS，这里用到了synchronized关键字让方法变成同步方法，真这样用CAS也就没必要了，那么Java中是怎么实现CAS的呢？可以在原子类里找到答案。</p>
+<h3 id="基于CAS的AtomicInteger"><a href="#基于CAS的AtomicInteger" class="headerlink" title="基于CAS的AtomicInteger"></a>基于CAS的AtomicInteger</h3><p>java.util.concurrent.atomic.* 包下提供了一些基本类型的原子变量类，可以在并发场景进行原子的加减操作，它们就是用到了CAS。</p>
+<p>从源码开始理解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AtomicInteger</span> <span class="keyword">extends</span> <span class="title">Number</span> <span class="keyword">implements</span> <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">6214790243416807050L</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// setup to use Unsafe.compareAndSwapInt for updates</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Unsafe unsafe = Unsafe.getUnsafe();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> valueOffset;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// 获取某个字段相对Java对象的“起始地址”的偏移量</span></span><br><span class="line">            valueOffset = unsafe.objectFieldOffset</span><br><span class="line">                (AtomicInteger.class.getDeclaredField(<span class="string">"value"</span>));</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception ex) &#123; <span class="keyword">throw</span> <span class="keyword">new</span> Error(ex); &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用volatile保证可见性</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> value;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 增加指定值，并返回增加后的值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">addAndGet</span><span class="params">(<span class="keyword">int</span> delta)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> unsafe.getAndAddInt(<span class="keyword">this</span>, valueOffset, delta) + delta;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，AtomicInteger使用volatile保证真实值的可见性，然后使用Unsafe类提供的CAS操作来更新value的值。</p>
+<p>Unsafe类名字看上去不太好听，但它确实不太安全。</p>
+<blockquote>
+<p>Unsafe类是在sun.misc包下，不属于Java标准。但是很多Java的基础类库，包括一些被广泛使用的高性能开发库都是基于Unsafe类开发的，比如Netty、Cassandra、Hadoop、Kafka等。Unsafe类在提升Java运行效率，增强Java语言底层操作能力方面起了很大的作用。</p>
+</blockquote>
+<blockquote>
+<p>Unsafe类使Java拥有了像C语言的指针一样操作内存空间的能力，同时也带来了指针的问题。过度的使用Unsafe类会使得出错的几率变大，因此Java官方并不建议使用的，官方文档也几乎没有。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Unsafe</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Unsafe theUnsafe;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 单例模式，私有化构造方法</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Unsafe</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="title">getAndAddInt</span><span class="params">(Object var1, <span class="keyword">long</span> var2, <span class="keyword">int</span> var4)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> var5;</span><br><span class="line">        <span class="keyword">do</span> &#123;</span><br><span class="line">            var5 = <span class="keyword">this</span>.getIntVolatile(var1, var2);</span><br><span class="line">        &#125; <span class="keyword">while</span>(!<span class="keyword">this</span>.compareAndSwapInt(var1, var2, var5, var5 + var4));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> var5;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">native</span> <span class="keyword">int</span> <span class="title">getIntVolatile</span><span class="params">(Object var1, <span class="keyword">long</span> var2)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">native</span> <span class="keyword">boolean</span> <span class="title">compareAndSwapInt</span><span class="params">(Object var1, <span class="keyword">long</span> var2, <span class="keyword">int</span> var4, <span class="keyword">int</span> var5)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>从源码中可以看出，Unsafe的CAS是通过一系列本地方法实现的。使用了硬件级别的原子操作，效率很高。</p>
+<h3 id="CAS算法缺陷"><a href="#CAS算法缺陷" class="headerlink" title="CAS算法缺陷"></a>CAS算法缺陷</h3><h4 id="只能操作一个共享变量"><a href="#只能操作一个共享变量" class="headerlink" title="只能操作一个共享变量"></a>只能操作一个共享变量</h4><p>从上面的分析可以看出，CAS只能对单个变量有效，如果有多个资源需要一起使用似乎无法实现。但实际上是有办法的，Java中提供了一个原子引用类，让我们可以以对象为目标进行原子操作，那就是AtomicReference。把多个共享资源放到一个对象中，然后通过AtomicReference包装这个对象即可。类似还有操作数组的AtomicReferenceArray。</p>
+<h4 id="过度消耗CPU"><a href="#过度消耗CPU" class="headerlink" title="过度消耗CPU"></a>过度消耗CPU</h4><p>由于CAS可能会无法更新值，那么一般是在一个循环中不断尝试知道成功，如果竞争很大，有些线程长时间循环，会导致过度消耗CPU。因此CAS更适合在读比写多的情况下使用，反之慎用。</p>
+<h4 id="ABA问题"><a href="#ABA问题" class="headerlink" title="ABA问题"></a>ABA问题</h4><p>再看看开始提到CAS时定义的方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">compareAndSwap</span><span class="params">(<span class="keyword">int</span> expectedValue,<span class="keyword">int</span> newValue)</span></span>;</span><br></pre></td></tr></table></figure>
+<p>如果真实值等于expectedValue，就能肯定这期间没人操作过资源吗？显然不能，比如另一个线程先把一个数+1，然后又-1。此时虽然值没变，但它已经经历了你不知道的事。</p>
+<p>那么ABA会造成什么恶劣影响呢？</p>
+<p>答案是一般不会（不会我说个锤子？但我就是要说，至少面试中经常问到），只能说一般我们期望保证在操作过程中没有其它人访问过这个资源，我才会应用我这段时间的更新（乐观锁也是锁啊，当然要保证这段时间只有我在操作啊，虽然我没锁定，但原则问题不能迁就），但是ABA使我们期望落空了，我们还不能察觉。</p>
+<p>想举个ABA造成不良影响的例子，硬是想不出来，网上也没找到喜欢的，有没有大佬留言来一个？</p>
+<p>ABA解决方案：核心思想就是，用于判断是否更新的值不能变回用过的值，这需要业务逻辑上做一定调整。Java中的解决方案是AtomicStampedReference，一个带版本号的原子引用类，比较时不比较业务中要用的值（这个值可能又回到最初的起点），使用一个版本号，每次修改都将版本号增加，也就是前面提到的版本号机制。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>悲观锁：锁定资源 -&gt; 使用 -&gt; 释放资源</li>
+<li>乐观锁：获取资源快照 -&gt; 使用 -&gt; 确定资源没改变 -&gt; 更新</li>
+<li>悲观锁适用竞争激烈的场景，乐观锁反之</li>
+<li>乐观锁可以用 版本号机制 + CAS算法 实现</li>
+</ol>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/08/08/concurrent-lock-reentrant/" class="next-post btn btn-default" title='探索JAVA并发 - 可重入锁和不可重入锁'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">探索JAVA并发 - 可重入锁和不可重入锁</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#定义"><span class="toc-text">定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#悲观锁"><span class="toc-text">悲观锁</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#乐观锁"><span class="toc-text">乐观锁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#版本号机制"><span class="toc-text">版本号机制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CAS算法"><span class="toc-text">CAS算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#基于CAS的AtomicInteger"><span class="toc-text">基于CAS的AtomicInteger</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CAS算法缺陷"><span class="toc-text">CAS算法缺陷</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#只能操作一个共享变量"><span class="toc-text">只能操作一个共享变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#过度消耗CPU"><span class="toc-text">过度消耗CPU</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ABA问题"><span class="toc-text">ABA问题</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号 ~ 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
