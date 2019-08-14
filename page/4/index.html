@@ -34,7 +34,7 @@
     <!--Title-->
 
 
-<title>标签: 并发 | 一杯82年的JAVA</title>
+<title>一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -153,148 +153,80 @@
         <div class="container">
             <div class="row">
                 <main class="col-md-8 main-content ">
-                    <ol class="breadcrumb">
+                    
+    <div class="carousel">
+        <a href="javascript:" target="_blank">
+            <img src="/images/emoji/eat-huaji.gif" alt="">
+        </a>
+    </div>
+
+
+
+
+
+<article class="post">
     
+    <div class="post-content">
+        <div class="post-head home-post-head">
+            <h1 class="post-title">
+                <a href="/2018/05/20/github-repository/">github搭建个人maven仓库</a>
+            </h1>
+            <div class="post-meta">  &bull;
+                <time class="post-date" datetime="" title="">
+                    2018年05月20日
+                </time>
+            </div>
+        </div>
+        <p class="brief">
+            
+                
+Maven对Java开发者来说是很常见的工具，有了它只需要在pom文件加几行代码就能引入第三方代码。如果想我们自己写的工具类也让别人通过这种方式使用，不妨借助github搭建个免费仓库。
+
+核心原理就是在github上建立一个代码仓...
+            
+        </p>
+    </div>
     
-        <li>
-            并发
-        </li>
+        <footer class="post-footer clearfix">
+            <div class="pull-left tag-list">
+                <div class="post-meta">
     
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/实践笔记/">实践笔记</a>
+        </span>
     
 
-</ol>
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/github/">github</a> <a class="tag-link" href="/tags/maven/">maven</a>
+                
+            </span>
+        </span>
+    
 
-
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/08/10/concurrent-lock-pessimistic-optimistic/">探索JAVA并发 - 悲观锁和乐观锁</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年08月10日
-                    </time>
-                </div>
+    
+</div>
             </div>
-            <p class="brief">
-                
-                    
-什么是悲观锁，什么是乐观锁，它们是如何实现的？
 
-定义
-悲观锁：对世界充满不信任，认为一定会发生冲突，因此在使用资源前先将其锁住，具有强烈的独占和排他特性。
-乐观锁：相信世界是和谐的，认为接下来的操作不会和别人发生冲突，因此不会上锁...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/08/08/concurrent-lock-reentrant/">探索JAVA并发 - 可重入锁和不可重入锁</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年08月08日
-                    </time>
-                </div>
+            <div class="post-permalink">
+                <a href="/2018/05/20/github-repository/" class="btn btn-default">阅读全文</a>
             </div>
-            <p class="brief">
-                
-                    
-什么是可重入锁，什么是不可重入锁，它们是如何实现的？
+        </footer>
+    
+</article>
 
-定义
-可重入锁：当线程获取某个锁后，还可以继续获取它，可以递归调用，而不会发生死锁；
-不可重入锁：与可重入相反，获取锁后不能重复获取，否则会死锁（自己锁自己）。
 
-不可重入锁用...
-                
-            </p>
+
+
+    <nav class="pagination" role="navigation">
+        <div id="page-nav">
+            <a class="extend prev" rel="prev" href="/page/3/"><i class='fa fa-angle-left'></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
         </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/08/04/concurrent-lock-contention-reduce/">探索JAVA并发 - 如何减少锁的竞争</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年08月04日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-锁的竞争会限制代码的可伸缩性，在并发编程时通过一些手段有意地减少锁竞争，可以让程序有更好的表现。
-
-所谓可伸缩性，即当增加计算资源(如CPU、内存、带宽等)时，程序的吞吐量或处理能力会相应增加。这个时候，我们当然希望增加的效果越明显...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/23/concurrent-sync-tool/">探索JAVA并发 - 同步工具类</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月23日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-同步工具类是个笼统的概念，它可以根据自身状态来协调线程的控制流，了解JAVA中常用的同步工具能帮助开发者写出更好的并发代码。
-
-闭锁 CountDownLatch闭锁的作用相当于一扇门，在这扇门没打开前，任何线程执行到这里都会被无情...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/22/concurrent_threadlocal/">探索JAVA并发 - ThreadLocal</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月22日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-使用ThreadLocal可以维持线程封闭性，使线程中的某个值与保存值的对象关联，防止对可变的单例变量或全局变量进行共享，但使用不当也会造成内存泄漏，先了解它，再使用它​。​
-
-从SimpleDateFormat说起SimpleDa...
-                
-            </p>
-        </div>
-    </article>
- 
-
-
-
-
+    </nav>
 
 
 

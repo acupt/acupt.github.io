@@ -1,0 +1,383 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.cn">
+    <!--SEO-->
+
+    <meta name="keywords" content="线程,同步" />
+
+
+    <meta name="description" content="
+sleep/wait/notify/notifyAll分别有什么作用？它们的区别是什么？wait时为什么要放在循环里而不能直接用if？
+
+简介首先对几个相关的方法做个简单解释，Object中有..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+<meta name="google-site-verification" content="WlBG-_1cX3ycewbPVYnbA7sRJRj6i8QBgDPmQN9LO_g" />
+
+    <!--Title-->
+
+
+<title>终于搞懂了sleep/wait/notify/notifyAll | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.cn">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/about/"><i class="fa "></i>关于</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="终于搞懂了sleep/wait/notify/notifyAll">
+            
+	            终于搞懂了sleep/wait/notify/notifyAll
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/同步/">同步</a> <a class="tag-link" href="/tags/线程/">线程</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/14</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>sleep/wait/notify/notifyAll分别有什么作用？它们的区别是什么？wait时为什么要放在循环里而不能直接用if？</p>
+</blockquote>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>首先对几个相关的方法做个简单解释，Object中有几个用于线程同步的方法：wait、notify、notifyAll。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Object</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">wait</span><span class="params">(<span class="keyword">long</span> timeout)</span> <span class="keyword">throws</span> InterruptedException</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">notify</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">native</span> <span class="keyword">void</span> <span class="title">notifyAll</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>wait: 释放当前锁，阻塞直到被notify或notifyAll唤醒，或者超时，或者线程被中断(InterruptedException)</li>
+<li>notify: 任意选择一个（无法控制选哪个）正在这个对象上等待的线程把它唤醒，其它线程依然在等待被唤醒</li>
+<li>notifyAll: 唤醒所有线程，让它们去竞争，不过也只有一个能抢到锁</li>
+<li>sleep: 不是Object中的方法，而是Thread类的静态方法，让当前线程持有锁阻塞指定时间</li>
+</ul>
+<h2 id="sleep和wait"><a href="#sleep和wait" class="headerlink" title="sleep和wait"></a>sleep和wait</h2><p>sleep和wait都可以让线程阻塞，也都可以指定超时时间，甚至还都会抛出中断异常InterruptedException。</p>
+<p>而它们最大的区别就在于，sleep时线程依然持有锁，别人无法进当前同步方法；wait时放弃了持有的锁，其它线程有机会进入该同步方法。多次提到同步方法，因为wait必须在synchronized同步代码块中，否则会抛出异常IllegalMonitorStateException，notify也是如此，可以说wait和notify是就是为了在同步代码中做线程调度而生的。</p>
+<p>下面一个简单的例子展现sleep和wait的区别：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 日志行号记录</span></span><br><span class="line">    <span class="keyword">private</span> AtomicInteger count = <span class="keyword">new</span> AtomicInteger();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Main main = <span class="keyword">new</span> Main();</span><br><span class="line">        <span class="comment">// 开启两个线程去执行test方法</span></span><br><span class="line">        <span class="keyword">new</span> Thread(main::test).start();</span><br><span class="line">        <span class="keyword">new</span> Thread(main::test).start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            log(<span class="string">"进入了同步方法，并开始睡觉，1s"</span>);</span><br><span class="line">            <span class="comment">// sleep不会释放锁，因此其他线程不能进入这个方法</span></span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">            log(<span class="string">"睡好了，但没事做，有事叫我，等待2s"</span>);</span><br><span class="line">            <span class="comment">//阻塞在此，并且释放锁，其它线程可以进入这个方法</span></span><br><span class="line">            <span class="comment">//当其它线程调用此对象的notify或者notifyAll时才有机会停止阻塞</span></span><br><span class="line">            <span class="comment">//就算没有人notify，如果超时了也会停止阻塞</span></span><br><span class="line">            wait(<span class="number">2000</span>);</span><br><span class="line">            log(<span class="string">"我要走了，但我要再睡一觉，10s"</span>);</span><br><span class="line">            <span class="comment">//这里睡的时间很长，因为没有释放锁，其它线程就算wait超时了也无法继续执行</span></span><br><span class="line">            Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">            log(<span class="string">"走了"</span>);</span><br><span class="line">            notify();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打印日志</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">log</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        System.out.println(count.incrementAndGet() + <span class="string">" "</span></span><br><span class="line">                + <span class="keyword">new</span> Date().toString().split(<span class="string">" "</span>)[<span class="number">3</span>]</span><br><span class="line">                + <span class="string">"\t"</span> + Thread.currentThread().getName() + <span class="string">" "</span> + s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">1 00:13:23	Thread-0 进入了同步方法，并开始睡觉，1s</span></span><br><span class="line"><span class="comment">2 00:13:24	Thread-0 睡好了，但没事做，有事叫我，等待2s</span></span><br><span class="line"><span class="comment">3 00:13:24	Thread-1 进入了同步方法，并开始睡觉，1s</span></span><br><span class="line"><span class="comment">4 00:13:25	Thread-1 睡好了，但没事做，有事叫我，等待2s</span></span><br><span class="line"><span class="comment">5 00:13:26	Thread-0 我要走了，但我要再睡一觉，10s</span></span><br><span class="line"><span class="comment">6 00:13:36	Thread-0 走了</span></span><br><span class="line"><span class="comment">7 00:13:36	Thread-1 我要走了，但我要再睡一觉，10s</span></span><br><span class="line"><span class="comment">8 00:13:46	Thread-1 走了</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>对输出做个简单解释（已经看懂代码的童鞋可以跳过）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1 00:13:23	Thread-0 进入了同步方法，并开始睡觉，1s     // Thread-0首先进入同步方法，Thread-1只能门外候着</span><br><span class="line">2 00:13:24	Thread-0 睡好了，但没事做，有事叫我，等待2s  // Thread-0 sleep 1秒这段时间，Thread-1没进来，证明sleep没有释放锁</span><br><span class="line">3 00:13:24	Thread-1 进入了同步方法，并开始睡觉，1s     // Thread-0开始wait后Thread-1马上就进来了，证明wait释放了锁</span><br><span class="line">4 00:13:25	Thread-1 睡好了，但没事做，有事叫我，等待2s  // Thread-1也打算wait 2秒（2秒后真的能醒来吗？）</span><br><span class="line">5 00:13:26	Thread-0 我要走了，但我要再睡一觉，10s      // Thread-0已经wait超时醒来了，这次准备sleep 10s</span><br><span class="line">6 00:13:36	Thread-0 走了                           // 10s过去了Thread-0都sleep结束了，那个说要wait 2s的Thread-1还没动静，证明超时也没用，还得抢到锁</span><br><span class="line">7 00:13:36	Thread-1 我要走了，但我要再睡一觉，10s     // Thread-0退出同步代码后，Thread-1才终于得到了锁，能行动了</span><br><span class="line">8 00:13:46	Thread-1 走了</span><br></pre></td></tr></table></figure>
+<h2 id="notify和notifyAll"><a href="#notify和notifyAll" class="headerlink" title="notify和notifyAll"></a>notify和notifyAll</h2><p>同样是唤醒等待的线程，同样最多只有一个线程能获得锁，同样不能控制哪个线程获得锁。</p>
+<p>区别在于：</p>
+<ul>
+<li>notify：唤醒一个线程，其他线程依然处于wait的等待唤醒状态，如果被唤醒的线程结束时没调用notify，其他线程就永远没人去唤醒，只能等待超时，或者被中断</li>
+<li>notifyAll：所有线程退出wait的状态，开始竞争锁，但只有一个线程能抢到，这个线程执行完后，其他线程又会有一个幸运儿脱颖而出得到锁</li>
+</ul>
+<p>如果觉得解释的不够明白，代码来一波：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ArrayBlockingQueue;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> AtomicInteger count = <span class="keyword">new</span> AtomicInteger();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Main main = <span class="keyword">new</span> Main();</span><br><span class="line">        <span class="comment">// 开启两个线程去执行test方法</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(main::testWait).start();</span><br><span class="line">        &#125;</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">            main.testNotify();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">testWait</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            log(<span class="string">"进入了同步方法，开始wait"</span>);</span><br><span class="line">            wait();</span><br><span class="line">            log(<span class="string">"wait结束"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">testNotify</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        notify();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">log</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        System.out.println(count.incrementAndGet() + <span class="string">" "</span></span><br><span class="line">                + <span class="keyword">new</span> Date().toString().split(<span class="string">" "</span>)[<span class="number">3</span>]</span><br><span class="line">                + <span class="string">"\t"</span> + Thread.currentThread().getName() + <span class="string">" "</span> + s);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">1 00:59:32	Thread-0 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">2 00:59:32	Thread-9 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">3 00:59:32	Thread-8 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">4 00:59:32	Thread-7 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">5 00:59:32	Thread-6 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">6 00:59:32	Thread-5 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">7 00:59:32	Thread-4 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">8 00:59:32	Thread-3 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">9 00:59:32	Thread-2 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">10 00:59:32	Thread-1 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">11 00:59:33	Thread-0 wait结束</span></span><br><span class="line"><span class="comment">12 00:59:33	Thread-6 wait结束</span></span><br><span class="line"><span class="comment">13 00:59:33	Thread-7 wait结束</span></span><br><span class="line"><span class="comment">14 00:59:33	Thread-8 wait结束</span></span><br><span class="line"><span class="comment">15 00:59:33	Thread-9 wait结束</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>例子中有10个线程在wait，但notify了5次，然后其它线程一直阻塞，这也就说明使用notify时如果不能准确控制和wait的线程数对应，会导致某些线程永远阻塞。</p>
+<p>PS：这里笔者多次运行发现第一个被唤醒的都是Thread-0，后面的顺序不同，但是看notify的源码注释说明确实是任意线程，那为什么第一次总是Thread-0被唤醒呢？注释里也说了选择会根据具体实现有所不同，也就是说应该是我的电脑的原因。具体什么原因就不得而知了，已经是个native方法了，没去看底层实现，不敢乱说。</p>
+<p>使用notifyAll唤醒所有等待的线程：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ArrayBlockingQueue;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Main</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> AtomicInteger count = <span class="keyword">new</span> AtomicInteger();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        Main main = <span class="keyword">new</span> Main();</span><br><span class="line">        <span class="comment">// 开启两个线程去执行test方法</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">new</span> Thread(main::testWait).start();</span><br><span class="line">        &#125;</span><br><span class="line">        Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        main.testNotifyAll();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">testWait</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            log(<span class="string">"进入了同步方法，开始wait"</span>);</span><br><span class="line">            wait();</span><br><span class="line">            log(<span class="string">"wait结束"</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">testNotifyAll</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        notifyAll();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">log</span><span class="params">(String s)</span> </span>&#123;</span><br><span class="line">        System.out.println(count.incrementAndGet() + <span class="string">" "</span></span><br><span class="line">                + <span class="keyword">new</span> Date().toString().split(<span class="string">" "</span>)[<span class="number">3</span>]</span><br><span class="line">                + <span class="string">"\t"</span> + Thread.currentThread().getName() + <span class="string">" "</span> + s);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">1 01:03:24	Thread-0 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">2 01:03:24	Thread-4 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">3 01:03:24	Thread-3 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">4 01:03:24	Thread-2 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">5 01:03:24	Thread-1 进入了同步方法，开始wait</span></span><br><span class="line"><span class="comment">6 01:03:25	Thread-1 wait结束</span></span><br><span class="line"><span class="comment">7 01:03:25	Thread-2 wait结束</span></span><br><span class="line"><span class="comment">8 01:03:25	Thread-3 wait结束</span></span><br><span class="line"><span class="comment">9 01:03:25	Thread-4 wait结束</span></span><br><span class="line"><span class="comment">10 01:03:25	Thread-0 wait结束</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>只需要调用一次notifyAll，所有的等待线程都结束了等待，并且依次（无序）获取锁完成了后续任务。</p>
+<h2 id="为什么wait要放到循环中使用"><a href="#为什么wait要放到循环中使用" class="headerlink" title="为什么wait要放到循环中使用"></a>为什么wait要放到循环中使用</h2><p>一些源码中出现wait时，往往都是伴随着一个循环语句出现的，比如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">f</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (!isOk()) &#123;</span><br><span class="line">        wait();</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(<span class="string">"I'm ok"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>既然wait会被阻塞直到被唤醒，那么用if+wait不就可以了吗？其他线程发现条件达到时notify一下不就行了？</p>
+<p>理想情况确实如此，但实际开发中我们往往不能保证这个线程被notify时条件已经满足了，因为很可能有某个无关(和这个条件的逻辑无关)的线程因为需要线程调度而调用了notify或者notifyAll。此时如果样例中位置等待的线程不巧被唤醒，它就会继续往下执行，但因为用的if，这次被唤醒就不会再判断条件是否满足，最终程序按照我们不期望的方式执行下去。</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/08/10/concurrent-lock-pessimistic-optimistic/" class="next-post btn btn-default" title='探索JAVA并发 - 悲观锁和乐观锁'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">探索JAVA并发 - 悲观锁和乐观锁</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#sleep和wait"><span class="toc-text">sleep和wait</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#notify和notifyAll"><span class="toc-text">notify和notifyAll</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#为什么wait要放到循环中使用"><span class="toc-text">为什么wait要放到循环中使用</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号 ~ 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
