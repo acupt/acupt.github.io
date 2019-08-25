@@ -34,7 +34,7 @@
     <!--Title-->
 
 
-<title>标签: jvm | 一杯82年的JAVA</title>
+<title>标签: 容器 | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -157,7 +157,7 @@
     
     
         <li>
-            jvm
+            容器
         </li>
     
     
@@ -170,71 +170,20 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
-                    <a href="/2019/07/29/jvm-shutdown-hook/">源码分析 - JVM关闭钩子的注册和调用</a>
+                    <a href="/2019/08/25/concurrent-container/">探索JAVA并发 - 并发容器全家福</a>
                 </h1>
                 <div class="post-meta">  &bull;
                     <time class="post-date" datetime="" title="">
-                        2019年07月29日
+                        2019年08月25日
                     </time>
                 </div>
             </div>
             <p class="brief">
                 
                     
-通过关闭钩子，我们可以在应用关闭时做一些自定义的操作，让程序更优雅的结束。
+14个并发容器，你用过几个？
 
-JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关闭。关闭的方式有多种，根据其行为的文明程度可大概分为两种：
-
-正常关闭  所有普...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/16/interview-oom-check/">内存泄漏如何排查</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月16日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-JAVA的垃圾回收机制给了程序猿便利，我们可以不需要显式释放资源。但想高枕无忧却是不能，OOM像个隐藏在暗处的幽(hua)灵(nong)，威胁着可怜、弱小又漂亮的程序猿。
-
-一般来说，一个健康的程序，它是不应该出现OOM的。内存里的...
-                
-            </p>
-        </div>
-    </article>
- 
-    <article class="post">
-        
-        <div class="post-content">
-            <div class="post-head home-post-head">
-                <h1 class="post-title">
-                    <a href="/2019/07/15/interview-gc/">JAVA GC 简析</a>
-                </h1>
-                <div class="post-meta">  &bull;
-                    <time class="post-date" datetime="" title="">
-                        2019年07月15日
-                    </time>
-                </div>
-            </div>
-            <p class="brief">
-                
-                    
-作为一个落魄的JAVA开发，在面试中常被问道：你是什么垃圾？哦不，是你对JAVA的垃圾回收机制有了解吗？
-
-接下来就对GC做一个全方位的总结，希望下次可以自信地回答面试官：我是可以被贵公司回收的那种。
-GC的时机首先，根据内存区域不...
+不考虑多线程并发的情况下，容器类一般使用ArrayList、HashMap等线程不安全的类，效率更高。在并发场景下，常会用到ConcurrentHashMap、ArrayBlockingQueue等线...
                 
             </p>
         </div>
