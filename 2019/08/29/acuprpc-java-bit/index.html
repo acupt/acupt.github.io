@@ -1,0 +1,386 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.cn">
+    <!--SEO-->
+
+    <meta name="keywords" content="JAVA" />
+
+
+    <meta name="description" content="
+&amp;, |, ^, ~ 这些符号什么意思？有什么妙用？一起来感受它们的神奇吧~
+
+当我们看一些源码的时候，经常会看到诸如 &amp;、|、&lt;&lt;、&gt;&gt; 的符号，这些..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+<meta name="google-site-verification" content="WlBG-_1cX3ycewbPVYnbA7sRJRj6i8QBgDPmQN9LO_g" />
+
+    <!--Title-->
+
+
+<title>JAVA中有趣的位运算 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.cn">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/about/"><i class="fa "></i>关于</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="JAVA中有趣的位运算">
+            
+	            JAVA中有趣的位运算
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/JAVA/">JAVA</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/JAVA/">JAVA</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/08/29</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>&amp;, |, ^, ~ 这些符号什么意思？有什么妙用？一起来感受它们的神奇吧~</p>
+</blockquote>
+<p>当我们看一些源码的时候，经常会看到诸如 &amp;、|、&lt;&lt;、&gt;&gt; 的符号，这些就是位运算符。</p>
+<p>位运算是直接对一个整形的二进制位进行操作，效率上比起加减乘除高不少，因此常运用在对性能很敏感的场景。</p>
+<h2 id="amp-与运算"><a href="#amp-与运算" class="headerlink" title="&amp; 与运算"></a>&amp; 与运算</h2><p>在二进制格式下，将两个数的每一位（1或0）分别做与运算（1&amp;1=1，其它=0），得到一个新的二进制数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         *   十进制       二进制</span></span><br><span class="line"><span class="comment">         *     5        0 1 0 1    从最低位(右)开始比较，不足的为0</span></span><br><span class="line"><span class="comment">         *     与          与</span></span><br><span class="line"><span class="comment">         *    14        1 1 1 0</span></span><br><span class="line"><span class="comment">         *     =           =</span></span><br><span class="line"><span class="comment">         *     4        0 1 0 0</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        System.out.println(<span class="number">5</span> &amp; <span class="number">14</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出: 4</span></span><br></pre></td></tr></table></figure>
+<p>判断整数n是奇数还是偶数：</p>
+<ul>
+<li>n &amp; 1 = 0 偶数</li>
+<li>n &amp; 1 = 1 奇数</li>
+</ul>
+<p>原理：二进制格式下，右边第一位是0则是偶数，反之为奇数，因此只需要和1进行与运算即可。</p>
+<h2 id="或运算"><a href="#或运算" class="headerlink" title="| 或运算"></a>| 或运算</h2><p>在二进制格式下，将两个数的每一位（1或0）分别做或运算（0|0=0，其它=1），得到一个新的二进制数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         *   十进制      二进制</span></span><br><span class="line"><span class="comment">         *     2        0 1 0     从最低位(右)开始比较，不足的为0</span></span><br><span class="line"><span class="comment">         *     或         或</span></span><br><span class="line"><span class="comment">         *     4        1 0 0</span></span><br><span class="line"><span class="comment">         *     =          =</span></span><br><span class="line"><span class="comment">         *     6        1 1 0</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        System.out.println(<span class="number">2</span> | <span class="number">4</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出: 6</span></span><br></pre></td></tr></table></figure>
+<p>在Linux系统中，文件权限管理用1、2、4分别表示执行x、写w、读r的权限。</p>
+<p>可以看做一个三位的二进制数，每一位分别表示一种权限的开启与否（1开启，0关闭），通过或运算组合就得到了不同的权限组合。</p>
+<p>所以最高权限就是7，即二进制的“111”，拥有读、写、执行全部权限。而777权限则是所属用户、组用户、其他用户都拥有最高权限。</p>
+<p>基于这个思路，我们只需要一个int或者long型的数字就可以存储几十个布尔类型的属性值，在某些场景下很有用。</p>
+<h2 id="异或运算"><a href="#异或运算" class="headerlink" title="^ 异或运算"></a>^ 异或运算</h2><pre><code>异或：相同为false，不同true
+</code></pre><p>在二进制格式下，将两个数的每一位（1或0）分别做异或运算（0^0=0，1^1=0, 其它=1），得到一个新的二进制数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         *   十进制      二进制</span></span><br><span class="line"><span class="comment">         *     2        0 1 0     从最低位(右)开始比较，不足的为0</span></span><br><span class="line"><span class="comment">         *    异或       异或</span></span><br><span class="line"><span class="comment">         *     6        1 1 0</span></span><br><span class="line"><span class="comment">         *     =          =</span></span><br><span class="line"><span class="comment">         *     4        1 0 0</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        System.out.println(<span class="number">2</span> ^ <span class="number">6</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出: 4</span></span><br></pre></td></tr></table></figure>
+<p>异或有个有趣的特性，它的逆运算是它本身，即A^B=C，C^B=A。基于这个特点，可以做一个简单的加密，把B作为秘钥，原文A用秘钥B加密后进行传输或存储等，使用时再用秘钥B进行解密。</p>
+<p>通过异或操作还能实现两个数的交换，不需要中间值。(简单测了下性能并没有很棒棒)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> x = <span class="number">2</span>;<span class="comment">// 010</span></span><br><span class="line">        <span class="keyword">int</span> y = <span class="number">4</span>;<span class="comment">// 100</span></span><br><span class="line">        x = x ^ y;<span class="comment">// 110</span></span><br><span class="line">        y = y ^ x;<span class="comment">// 010</span></span><br><span class="line">        x = x ^ y;<span class="comment">// 100</span></span><br><span class="line">        System.out.println(<span class="string">"x = "</span> + x);</span><br><span class="line">        System.out.println(<span class="string">"y = "</span> + y);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">x = 4</span></span><br><span class="line"><span class="comment">y = 2</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="非运算"><a href="#非运算" class="headerlink" title="~ 非运算"></a>~ 非运算</h2><p>在二进制格式下，将两个数的每一位（1或0）分别做非运算（~0=1，~1=0），得到一个新的二进制数。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(~<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出: -2</span></span><br></pre></td></tr></table></figure>
+<p>1进行非运算后值成了负数，不只是1，只要是正数，取非后都是负数，因为对于有符号的整数，最高位（最左边）是用来表示正负的，最高位为0是正数，1是负数。</p>
+<p>正数1非运算后从“00000000000000000000000000000001”变成了“11111111111111111111111111111110”。</p>
+<p>二进制表示负数的情况，要转成十进制需要两个步骤：</p>
+<ol>
+<li>逐位取反  -&gt; 00000000000000000000000000000001(2进制)</li>
+<li>加1      -&gt; 00000000000000000000000000000010(2进制) -&gt; 2(10进制)</li>
+<li>加上负号  -&gt; -2(10进制)</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过位运算可以巧妙且高效地达到某些目的，但如果不是很有必要，并不建议使用，毕竟可读性不高，别人看起来太痛苦（想想在阅读源码时看到一堆位运算的心情）。</p>
+<p>这次简单介绍了与、或、非、异或，下次再讲讲移位操作的实践。</p>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/08/25/concurrent-container/" class="next-post btn btn-default" title='探索JAVA并发 - 并发容器全家福'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">探索JAVA并发 - 并发容器全家福</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#amp-与运算"><span class="toc-text">&amp; 与运算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#或运算"><span class="toc-text">| 或运算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异或运算"><span class="toc-text">^ 异或运算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#非运算"><span class="toc-text">~ 非运算</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号 ~ 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
