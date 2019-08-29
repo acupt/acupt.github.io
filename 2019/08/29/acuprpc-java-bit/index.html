@@ -24,7 +24,8 @@
     <meta name="description" content="
 &amp;, |, ^, ~ 这些符号什么意思？有什么妙用？一起来感受它们的神奇吧~
 
-当我们看一些源码的时候，经常会看到诸如 &amp;、|、&lt;&lt;、&gt;&gt; 的符号，这些..." />
+当我们看一些源码的时候，经常会看到诸如 &amp;、|、^、~ 的符号，这些就是位运算符。
+位运算是直接..." />
 
 
 
@@ -205,7 +206,7 @@
         <blockquote>
 <p>&amp;, |, ^, ~ 这些符号什么意思？有什么妙用？一起来感受它们的神奇吧~</p>
 </blockquote>
-<p>当我们看一些源码的时候，经常会看到诸如 &amp;、|、&lt;&lt;、&gt;&gt; 的符号，这些就是位运算符。</p>
+<p>当我们看一些源码的时候，经常会看到诸如 &amp;、|、^、~ 的符号，这些就是位运算符。</p>
 <p>位运算是直接对一个整形的二进制位进行操作，效率上比起加减乘除高不少，因此常运用在对性能很敏感的场景。</p>
 <h2 id="amp-与运算"><a href="#amp-与运算" class="headerlink" title="&amp; 与运算"></a>&amp; 与运算</h2><p>在二进制格式下，将两个数的每一位（1或0）分别做与运算（1&amp;1=1，其它=0），得到一个新的二进制数。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         *   十进制       二进制</span></span><br><span class="line"><span class="comment">         *     5        0 1 0 1    从最低位(右)开始比较，不足的为0</span></span><br><span class="line"><span class="comment">         *     与          与</span></span><br><span class="line"><span class="comment">         *    14        1 1 1 0</span></span><br><span class="line"><span class="comment">         *     =           =</span></span><br><span class="line"><span class="comment">         *     4        0 1 0 0</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        System.out.println(<span class="number">5</span> &amp; <span class="number">14</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 输出: 4</span></span><br></pre></td></tr></table></figure>
