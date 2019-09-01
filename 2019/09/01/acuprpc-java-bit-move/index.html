@@ -207,6 +207,16 @@
 </blockquote>
 <p>上次介绍了<a href="/2019/08/29/acuprpc-java-bit/">JAVA中有趣的位运算</a>，知道了位运算是直接对一个整形的二进制位进行操作，效率上比起加减乘除高不少，因此常运用在对性能很敏感的场景。</p>
 <p>今天介绍在二进制下的移位操作。</p>
+<h2 id="原码、反码、补码"><a href="#原码、反码、补码" class="headerlink" title="原码、反码、补码"></a>原码、反码、补码</h2><p>磨刀不误砍柴工，这几个名词可还有印象？</p>
+<ul>
+<li>原码: 二进制表示，最左边的一位是符号位，0表示正数，1表示负数</li>
+<li>反码: 正数时同原码，负数时，等于原码每位取反（除了符号位）</li>
+<li>补码: 正数时同原码，负数时，等于反码+1</li>
+</ul>
+<blockquote>
+<p>在计算机系统中，数值一律用补码来表示和存储。原因在于，使用补码，可以将符号位和数值域统一处理；同时，加法和减法也可以统一处理。此外，补码与原码相互转换，其运算过程是相同的，不需要额外的硬件电路。</p>
+</blockquote>
+<p>JAVA中也一样，存储和移位操作的都是补码，正数时都一样，负数时就要注意了。</p>
 <h2 id="lt-lt-左移位"><a href="#lt-lt-左移位" class="headerlink" title="&lt;&lt; 左移位"></a>&lt;&lt; 左移位</h2><p>在二进制格式下，把所有的数字向左移动指定位数，左边的高位移出(舍弃)，右边的低位多出来的空位补0。</p>
 <p>n = n &lt;&lt; 1，左移一位，相当于 n = n * 2</p>
 <p>需要注意的是，正数的二进制最高位是0，如果左移后被怼上来的那位是1，这个数就成了负数。</p>
@@ -217,7 +227,7 @@
 <h2 id="gt-gt-右移位"><a href="#gt-gt-右移位" class="headerlink" title="&gt;&gt; 右移位"></a>&gt;&gt; 右移位</h2><p>在二进制格式下，把所有的数字向右移动指定位数，低位移出(舍弃)，高位的空位补符号位，即正数补0，负数补1(想想负数存的补码和原码是不同的)。</p>
 <p>n = n &gt;&gt; 1，右移一位，相当于 n = n / 2 (PS:正数时)</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="number">6</span>;                                   <span class="comment">// ..110 (6)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移1位 "</span> + (n &gt;&gt; <span class="number">1</span>));<span class="comment">// ..011 (3)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移2位 "</span> + (n &gt;&gt; <span class="number">2</span>));<span class="comment">// ..001 (1)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移3位 "</span> + (n &gt;&gt; <span class="number">3</span>));<span class="comment">// ..000 (0)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移4位 "</span> + (n &gt;&gt; <span class="number">4</span>));<span class="comment">// ..000 (0)</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">6右移1位 3</span></span><br><span class="line"><span class="comment">6右移2位 1</span></span><br><span class="line"><span class="comment">6右移3位 0</span></span><br><span class="line"><span class="comment">6右移4位 0</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
-<p>上面是正数右移，负数的时候情况就有点不同了。</p>
+<p>上面是正数右移，负数的时候情况又有点不同了。</p>
 <p><img src="/img/emoji/你呀总是能给我出点新花样.jpg" alt="你呀总是能给我出点新花样"></p>
 <p>由于计算机存储和位移的都是补码，正数补码和原码一样，一直右移最后都变成了0，就像一直整除2，最后不管怎么除都是0。</p>
 <p>而负数的补码一直右移最后全都是1，即:</p>
@@ -317,7 +327,7 @@
     <div class="widget">
         <h3 class="title">文章目录</h3>
         
-            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-lt-左移位"><span class="toc-text">&lt;&lt; 左移位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gt-gt-右移位"><span class="toc-text">&gt;&gt; 右移位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gt-gt-gt-无符号右移"><span class="toc-text">&gt;&gt;&gt; 无符号右移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-lt-lt-无符号左移"><span class="toc-text">&lt;&lt;&lt; 无符号左移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#位数限制"><span class="toc-text">位数限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#原码、反码、补码"><span class="toc-text">原码、反码、补码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-lt-左移位"><span class="toc-text">&lt;&lt; 左移位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gt-gt-右移位"><span class="toc-text">&gt;&gt; 右移位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gt-gt-gt-无符号右移"><span class="toc-text">&gt;&gt;&gt; 无符号右移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-lt-lt-无符号左移"><span class="toc-text">&lt;&lt;&lt; 无符号左移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#位数限制"><span class="toc-text">位数限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
         
     </div>
 </aside>
