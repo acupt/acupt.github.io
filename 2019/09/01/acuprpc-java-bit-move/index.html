@@ -1,0 +1,387 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.cn">
+    <!--SEO-->
+
+    <meta name="keywords" content="JAVA" />
+
+
+    <meta name="description" content="
+&lt;&lt;, &gt;&gt;, &gt;&gt;&gt; 这些符号什么意思？有哪些容易被遗漏的细节？
+
+上次介绍了JAVA中有趣的位运算，知道了位运算是直接对一个整形的二进制位进行操作..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+<meta name="google-site-verification" content="WlBG-_1cX3ycewbPVYnbA7sRJRj6i8QBgDPmQN9LO_g" />
+
+    <!--Title-->
+
+
+<title>JAVA中有趣的移位操作 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.cn">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/about/"><i class="fa "></i>关于</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="JAVA中有趣的移位操作">
+            
+	            JAVA中有趣的移位操作
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/JAVA/">JAVA</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/JAVA/">JAVA</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/09/01</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>&lt;&lt;, &gt;&gt;, &gt;&gt;&gt; 这些符号什么意思？有哪些容易被遗漏的细节？</p>
+</blockquote>
+<p>上次介绍了<a href="/2019/08/29/acuprpc-java-bit/">JAVA中有趣的位运算</a>，知道了位运算是直接对一个整形的二进制位进行操作，效率上比起加减乘除高不少，因此常运用在对性能很敏感的场景。</p>
+<p>今天介绍在二进制下的移位操作。</p>
+<h2 id="lt-lt-左移位"><a href="#lt-lt-左移位" class="headerlink" title="&lt;&lt; 左移位"></a>&lt;&lt; 左移位</h2><p>在二进制格式下，把所有的数字向左移动指定位数，左边的高位移出(舍弃)，右边的低位多出来的空位补0。</p>
+<p>n = n &lt;&lt; 1，左移一位，相当于 n = n * 2</p>
+<p>需要注意的是，正数的二进制最高位是0，如果左移后被怼上来的那位是1，这个数就成了负数。</p>
+<p>如果觉得奇怪，想想有时候我们遇到过的场景：一个很大的int正数，乘一个正数后如果结果超过了int能存储的极限，往往就变成了负数，或者一个很小的正数。</p>
+<p>另一个需要注意的地方，由于Java只存储补码，正数补码和原码相同先不管，负数的补码会把原码的0变成1，所以负数左移位时，移出去的最高是1，后面怼上来的一般也是1(没到极限)，所以还是负数。</p>
+<pre><code>对于程序员，或许还是把内容和代码放在一起更容易让人注意...
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="number">6</span>;                                   <span class="comment">// ..000110 (6)</span></span><br><span class="line">        System.out.println(n + <span class="string">"左移1位 "</span> + (n &lt;&lt; <span class="number">1</span>));<span class="comment">// ..001100 (12)</span></span><br><span class="line">        System.out.println(n + <span class="string">"左移2位 "</span> + (n &lt;&lt; <span class="number">2</span>));<span class="comment">// ..011000 (24)</span></span><br><span class="line">        System.out.println(n + <span class="string">"左移3位 "</span> + (n &lt;&lt; <span class="number">3</span>));<span class="comment">// ..110000 (48)</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通过2进制的方式赋值(jdk7+)，0b开头，后面是二进制表示(超过int最大值就要结尾加L成为Long)</span></span><br><span class="line">        <span class="comment">// 等同于int x = 1073741825</span></span><br><span class="line">        <span class="comment">// 01000000000000000000000000000001 第一位0表示正数</span></span><br><span class="line">        <span class="keyword">int</span> x = <span class="number">0b01000000000000000000000000000001</span>;</span><br><span class="line">        System.out.println(<span class="string">"x = "</span> + x);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 10000000000000000000000000000010</span></span><br><span class="line">        <span class="comment">// 左移后最高位成了1，变成了负数</span></span><br><span class="line">        System.out.println(<span class="string">"x左移1位\t= "</span> + (x &lt;&lt; <span class="number">1</span>));</span><br><span class="line">        <span class="comment">// 就像乘2如果超过了int最大值也会变成负数，结果是一样一样的</span></span><br><span class="line">        System.out.println(<span class="string">"x乘2\t= "</span> + (x * <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果左移两位，最高位依然是正数(4)</span></span><br><span class="line">        <span class="comment">// 00000000000000000000000000000100</span></span><br><span class="line">        System.out.println(<span class="string">"x左移2位\t= "</span> + (x &lt;&lt; <span class="number">2</span>));</span><br><span class="line">        <span class="comment">// 正数超过极限可能变成负数，负数变成正数也不奇怪吧</span></span><br><span class="line">        System.out.println(<span class="string">"x乘4\t= "</span> + (x * <span class="number">2</span> * <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// y = -3 时:</span></span><br><span class="line">        <span class="comment">// 原码: 10000000000000000000000000000011</span></span><br><span class="line">        <span class="comment">// 反码: 11111111111111111111111111111100 (符号位除外，其余取反)</span></span><br><span class="line">        <span class="comment">// 补码: 11111111111111111111111111111101 (反码+1)</span></span><br><span class="line">        <span class="comment">// Java存储补码，移位操作也是对补码操作</span></span><br><span class="line">        <span class="comment">// 也就解释了为啥负数时左移1位也能和乘2结果一样(最高位的1没了，后面跟上来的也是1，符号还是负)</span></span><br><span class="line">        <span class="keyword">int</span> y = -<span class="number">3</span>;</span><br><span class="line">        System.out.println(y + <span class="string">" 二进制表示(补码) "</span> + Integer.toBinaryString(y));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//补码左移一位后: 11111111111111111111111111111010</span></span><br><span class="line">        <span class="comment">//转为反码:      11111111111111111111111111111001  (补码-1)</span></span><br><span class="line">        <span class="comment">//转为原码:      10000000000000000000000000000110</span></span><br><span class="line">        <span class="comment">//十进制: -6</span></span><br><span class="line">        System.out.println(y + <span class="string">" 左移1位 "</span> + (y &lt;&lt; <span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">6左移1位 12</span></span><br><span class="line"><span class="comment">6左移2位 24</span></span><br><span class="line"><span class="comment">6左移3位 48</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">x = 1073741825</span></span><br><span class="line"><span class="comment">x左移1位    = -2147483646</span></span><br><span class="line"><span class="comment">x乘2	   = -2147483646</span></span><br><span class="line"><span class="comment">x左移2位	= 4</span></span><br><span class="line"><span class="comment">x乘4	   = 4</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">-3 二进制表示(补码) 11111111111111111111111111111101</span></span><br><span class="line"><span class="comment">-3 左移1位 -6</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="gt-gt-右移位"><a href="#gt-gt-右移位" class="headerlink" title="&gt;&gt; 右移位"></a>&gt;&gt; 右移位</h2><p>在二进制格式下，把所有的数字向右移动指定位数，低位移出(舍弃)，高位的空位补符号位，即正数补0，负数补1(想想负数存的补码和原码是不同的)。</p>
+<p>n = n &gt;&gt; 1，右移一位，相当于 n = n / 2 (PS:正数时)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> n = <span class="number">6</span>;                                   <span class="comment">// ..110 (6)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移1位 "</span> + (n &gt;&gt; <span class="number">1</span>));<span class="comment">// ..011 (3)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移2位 "</span> + (n &gt;&gt; <span class="number">2</span>));<span class="comment">// ..001 (1)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移3位 "</span> + (n &gt;&gt; <span class="number">3</span>));<span class="comment">// ..000 (0)</span></span><br><span class="line">        System.out.println(n + <span class="string">"右移4位 "</span> + (n &gt;&gt; <span class="number">4</span>));<span class="comment">// ..000 (0)</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">6右移1位 3</span></span><br><span class="line"><span class="comment">6右移2位 1</span></span><br><span class="line"><span class="comment">6右移3位 0</span></span><br><span class="line"><span class="comment">6右移4位 0</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<p>上面是正数右移，负数的时候情况就有点不同了。</p>
+<p><img src="/img/emoji/你呀总是能给我出点新花样.jpg" alt="你呀总是能给我出点新花样"></p>
+<p>由于计算机存储和位移的都是补码，正数补码和原码一样，一直右移最后都变成了0，就像一直整除2，最后不管怎么除都是0。</p>
+<p>而负数的补码一直右移最后全都是1，即:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">补码:   11111111111111111111111111111111</span><br><span class="line">反码:   11111111111111111111111111111110 (补码-1)</span><br><span class="line">原码:   10000000000000000000000000000001</span><br><span class="line">十进制: -1</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> m = -<span class="number">3</span>;</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码 "</span> + Integer.toBinaryString(m));</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码右移1位 "</span> + (m &gt;&gt; <span class="number">1</span>));</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码右移2位 "</span> + (m &gt;&gt; <span class="number">2</span>));</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码右移3位 "</span> + (m &gt;&gt; <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">-3	补码 11111111111111111111111111111101</span></span><br><span class="line"><span class="comment">-3	补码右移1位 -2</span></span><br><span class="line"><span class="comment">-3	补码右移2位 -1</span></span><br><span class="line"><span class="comment">-3	补码右移3位 -1</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="gt-gt-gt-无符号右移"><a href="#gt-gt-gt-无符号右移" class="headerlink" title="&gt;&gt;&gt; 无符号右移"></a>&gt;&gt;&gt; 无符号右移</h2><p>依然是右移指定位数，与右移不同的是，无论正负，高位均补0。对于正数没影响，对于负数来说，这样一移，直接变成正数了。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> m = -<span class="number">3</span>;</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码 "</span> + Integer.toBinaryString(m));</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码无符号右移1位 "</span> + (m &gt;&gt;&gt; <span class="number">1</span>));</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码无符号右移2位 "</span> + (m &gt;&gt;&gt; <span class="number">2</span>));</span><br><span class="line">        System.out.println(m + <span class="string">"\t补码无符号右移3位 "</span> + (m &gt;&gt;&gt; <span class="number">3</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">-3	补码 11111111111111111111111111111101</span></span><br><span class="line"><span class="comment">-3	补码无符号右移1位 2147483646</span></span><br><span class="line"><span class="comment">-3	补码无符号右移2位 1073741823</span></span><br><span class="line"><span class="comment">-3	补码无符号右移3位 536870911</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="lt-lt-lt-无符号左移"><a href="#lt-lt-lt-无符号左移" class="headerlink" title="&lt;&lt;&lt; 无符号左移"></a>&lt;&lt;&lt; 无符号左移</h2><p><div align="center"> <img src="/img/emoji/还有这种操作.jpeg" alt="还有这种操作"></div></p>
+<p><div align="center"> <img src="/img/emoji/没有这种操作.jpg" alt="没有这种操作"></div></p>
+<h2 id="位数限制"><a href="#位数限制" class="headerlink" title="位数限制"></a>位数限制</h2><p>一个容易忽略的地方，每次移动一位循环N次，和一次移动N位，结果并不一定是一样的。</p>
+<p>以int为例，如果直接左移36位，结果并不是0，而是等同于左移36%32=4位。</p>
+<p>右移和无符号右移也同样适用。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bit</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> m = <span class="number">3</span>;</span><br><span class="line">        <span class="keyword">int</span> t = m;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= <span class="number">36</span>; i++) &#123;</span><br><span class="line">            t = t &lt;&lt; <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(t);</span><br><span class="line">        System.out.println(m &lt;&lt; <span class="number">36</span>);</span><br><span class="line">        System.out.println(m &lt;&lt; (<span class="number">36</span> % <span class="number">32</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 输出:</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">0</span></span><br><span class="line"><span class="comment">48</span></span><br><span class="line"><span class="comment">48</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ol>
+<li>箭头朝哪边，就往哪边移位</li>
+<li>左移操作相当于乘2，右移相当于除2，不全是</li>
+<li>左移操作可能改变正负，因为符号位会被移走，新符号位不一定和以前一样</li>
+<li>右移操作不改变符号，因为左边填充的是符号位</li>
+<li>无符号右移会把负数变成正数</li>
+<li>没有无符号左移</li>
+<li>位移超过JAVA基本类型的位数后，等同于位移取模后的位数</li>
+</ol>
+
+    </div>
+    
+        <div class="reward" ontouchstart>
+    <div class="reward-wrap">码
+        <div class="reward-box">
+            
+            
+                <span class="reward-type">
+                    <img class="wechat" src="/img/qrcode_wx_logo_12cm.jpg"><b>微信扫一扫，动态全知晓</b>
+                </span>
+            
+        </div>
+    </div>
+    <p class="reward-tip">赏个关注，共同进步</p>
+</div>
+
+
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+    
+        <a href="/2019/08/29/acuprpc-java-bit/" class="next-post btn btn-default" title='JAVA中有趣的位运算'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">JAVA中有趣的位运算</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-lt-左移位"><span class="toc-text">&lt;&lt; 左移位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gt-gt-右移位"><span class="toc-text">&gt;&gt; 右移位</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#gt-gt-gt-无符号右移"><span class="toc-text">&gt;&gt;&gt; 无符号右移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#lt-lt-lt-无符号左移"><span class="toc-text">&lt;&lt;&lt; 无符号左移</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#位数限制"><span class="toc-text">位数限制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018 | 微信公众号 ~ 一杯82年的JAVA
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>
