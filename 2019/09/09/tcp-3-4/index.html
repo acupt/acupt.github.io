@@ -221,8 +221,8 @@
 <li>close_wait何时出现，大量出现时怎么处理</li>
 </ul>
 <h2 id="入门"><a href="#入门" class="headerlink" title="入门"></a>入门</h2><p>入门级回答，简单描述下客户端和服务端之间每次在做什么。</p>
-<pre><code>![tcp](/img/chart/tpc-3-4-simple.png)
-</code></pre><p>发起连接请求的是客户端，接收连接请求的是服务端。</p>
+<p><img src="/img/chart/tpc-3-4-simple.png" alt="tcp"></p>
+<p>发起连接请求的是客户端，接收连接请求的是服务端。</p>
 <p>对于图中的几个关键词，是TCP报文中的控制位中的标志（为1表示有对应标志）</p>
 <ul>
 <li>SYN 表示建立连接</li>
@@ -243,8 +243,8 @@
 </ol>
 <p>断开连接可以由任意一方先提出，一般是客户端提出的。</p>
 <h2 id="进阶"><a href="#进阶" class="headerlink" title="进阶"></a>进阶</h2><p>上面的描述比较简单，我们可以更加深入探索客户端和服务端之间的种种行为。</p>
-<pre><code>![tcp](/img/chart/tpc-3-4.png)
-</code></pre><ul>
+<p><img src="/img/chart/tpc-3-4.png" alt="tcp"></p>
+<ul>
 <li>SYN 表示建立连接</li>
 <li>FIN 表示关闭连接</li>
 <li>ACK 表示响应</li>
@@ -269,10 +269,9 @@
 <li>服务端收到ACK后也变为CLOSED状态</li>
 </ol>
 <h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><p>对于上面描述的过程，如果你之前不太了解，那么针对某些点肯定会有些许疑问。</p>
-<pre><code>&lt;div align = &quot;center&quot;&gt;
-&lt;img src=&quot;/img/emoji/俺也一样-面试官.png&quot; width=&quot;50%&quot;&gt;
-&lt;/div&gt;
-</code></pre><p>下面总结一些可以延伸的问题。</p>
+<div align="center"><br><img src="/img/emoji/俺也一样-面试官.png" width="50%"><br></div>
+
+<p>下面总结一些可以延伸的问题。</p>
 <h3 id="为什么建立连接要三次握手"><a href="#为什么建立连接要三次握手" class="headerlink" title="为什么建立连接要三次握手"></a>为什么建立连接要三次握手</h3><p>为何是三，不是二，也不是四？借助经典的打电话的场景来帮助理解。</p>
 <ul>
 <li>第一次握手：A对B说，小B，能听到吗？（SYN）</li>
@@ -287,18 +286,18 @@
 <h3 id="为什么断开连接需要四次挥手"><a href="#为什么断开连接需要四次挥手" class="headerlink" title="为什么断开连接需要四次挥手"></a>为什么断开连接需要四次挥手</h3><p>为什么不能像建立连接那样三次？毕竟三次就能保证互相知晓了。</p>
 <p>回顾上面的图，可以看到服务端得知客户端想要断开连接后，先给客户端发了一个ACK包，然后又发了一个FIN包，问题的关键在于这两步能否合并，如果可以那么就可以精简为三次挥手。</p>
 <p>答案当然是不可以。因为服务端得知客户端想断开连接时，它这边可能还有些事没处理完，比如还有些消息没发完（我还有话说系列）。等它处理好后，再给客户端发送一个FIN包，表示它也可以结束了，这是客户端再发个ACK包到服务端，表示他知道了。</p>
-<pre><code>&lt;div align = &quot;center&quot;&gt;
-&lt;img src=&quot;/img/article/为什么四次挥手.png&quot; width=&quot;50%&quot;&gt;
-&lt;/div&gt;
-</code></pre><h3 id="TCP报文格式"><a href="#TCP报文格式" class="headerlink" title="TCP报文格式"></a>TCP报文格式</h3><p>这个问题笔者面试时被问到过，当时自信且流畅地说完TCP的连接过程，甚至在内心默默给自己点了个赞。。。后面不说也罢。</p>
+<div align="center"><br><img src="/img/article/为什么四次挥手.png" width="50%"><br></div>
+
+
+<h3 id="TCP报文格式"><a href="#TCP报文格式" class="headerlink" title="TCP报文格式"></a>TCP报文格式</h3><p>这个问题笔者面试时被问到过，当时自信且流畅地说完TCP的连接过程，甚至在内心默默给自己点了个赞。。。后面不说也罢。</p>
 <p>TCP的报文构造还是有点复杂的，这里不讨论了，网上找了个图（来源见水印）。</p>
 <p>可以看到上面曾有过出镜的FIN、ACK、SYN等东东，这些都存在报文对应位置。</p>
-<pre><code>![TCP结构](/img/struct/TCP结构.png)
-</code></pre><h3 id="慢开始与拥塞避免"><a href="#慢开始与拥塞避免" class="headerlink" title="慢开始与拥塞避免"></a>慢开始与拥塞避免</h3><blockquote>
+<p><img src="/img/struct/TCP结构.png" alt="TCP结构"></p>
+<h3 id="慢开始与拥塞避免"><a href="#慢开始与拥塞避免" class="headerlink" title="慢开始与拥塞避免"></a>慢开始与拥塞避免</h3><blockquote>
 <p>发送方维持一个叫做拥塞窗口cwnd（congestion window）的状态变量。拥塞窗口的大小取决于网络的拥塞程度，并且动态地在变化。发送方让自己的发送窗口等于拥塞窗口，另外考虑到接受方的接收能力，发送窗口可能小于拥塞窗口。</p>
 </blockquote>
-<pre><code>![TCP结构](/img/article/慢开始与拥塞避免.png)
-</code></pre><h3 id="快重传与快恢复"><a href="#快重传与快恢复" class="headerlink" title="快重传与快恢复"></a>快重传与快恢复</h3><h4 id="快重传"><a href="#快重传" class="headerlink" title="快重传"></a>快重传</h4><blockquote>
+<p><img src="/img/article/慢开始与拥塞避免.png" alt="TCP结构"></p>
+<h3 id="快重传与快恢复"><a href="#快重传与快恢复" class="headerlink" title="快重传与快恢复"></a>快重传与快恢复</h3><h4 id="快重传"><a href="#快重传" class="headerlink" title="快重传"></a>快重传</h4><blockquote>
 <p>发送方只要一连收到三个重复确认就应当立即重传对方尚未收到的报文段，而不必继续等待设置的重传计时器时间到期</p>
 </blockquote>
 <h4 id="快恢复"><a href="#快恢复" class="headerlink" title="快恢复"></a>快恢复</h4><blockquote>
@@ -307,8 +306,8 @@
 <li>考虑到如果网络出现拥塞的话就不会收到好几个重复的确认，所以发送方现在认为网络可能没有出现拥塞。所以此时不执行慢开始算法，而是将cwnd设置为ssthresh的大小，然后执行拥塞避免算法 </li>
 </ol>
 </blockquote>
-<pre><code>![TCP结构](/img/article/连续三个重复确认.png)
-</code></pre><h3 id="time-wait何时出现，大量出现时怎么发现和处理"><a href="#time-wait何时出现，大量出现时怎么发现和处理" class="headerlink" title="time_wait何时出现，大量出现时怎么发现和处理"></a>time_wait何时出现，大量出现时怎么发现和处理</h3><p>time_wait是主动关闭的一方会出现的状态，当收到对方发来的FIN包并返回一个ACK后，进入time_wait。</p>
+<p><img src="/img/article/连续三个重复确认.png" alt="TCP结构"></p>
+<h3 id="time-wait何时出现，大量出现时怎么发现和处理"><a href="#time-wait何时出现，大量出现时怎么发现和处理" class="headerlink" title="time_wait何时出现，大量出现时怎么发现和处理"></a>time_wait何时出现，大量出现时怎么发现和处理</h3><p>time_wait是主动关闭的一方会出现的状态，当收到对方发来的FIN包并返回一个ACK后，进入time_wait。</p>
 <p>time_wait存在的原因有两点 </p>
 <ol>
 <li>可靠地终止连接：若处于time_wait的client发送给server确认报文段丢失的话，server将在此又一次发送FIN报文段，那么client必须处于一个可接收的状态就是time_wait而不是close状态。 </li>
