@@ -268,7 +268,7 @@
 <p>引用了此依赖的项目在启动时会把SyncJobConfig类里面定义的bean创建并管理。</p>
 <p>有两个重要的bean需要在SyncJobConfig中创建：</p>
 <ol>
-<li>自定义bean扫描类，实现BeanPostProcessor接口，spring每创建一个bean都会调用里，可以扫描含@SyncJob方法的bean，放入“集合”备用，也可以在这里注册作业信息到schedule-service（或者启动后注册）</li>
+<li>自定义bean扫描类，实现BeanPostProcessor接口，spring每创建一个bean都会调用它的方法，可以用来扫描含@SyncJob方法的bean，放入“集合”备用，也可以在这里注册作业信息到schedule-service（或者启动后注册）</li>
 <li>定时任务执行类，负责执行核心流程：轮询，加锁，执行，解锁…</li>
 </ol>
 <h2 id="防坑指南"><a href="#防坑指南" class="headerlink" title="防坑指南"></a>防坑指南</h2><h3 id="应用关闭-重启导致锁未释放"><a href="#应用关闭-重启导致锁未释放" class="headerlink" title="应用关闭/重启导致锁未释放"></a>应用关闭/重启导致锁未释放</h3><p>Q：任务执行中如果有人重发怎么办？任务执行到一半应用关闭，锁也没释放，重启后永远查询不到那个作业的记录。</p>
@@ -346,6 +346,11 @@
 </article>
 
 <div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2019/10/24/linux-action/linux-action-1/" class="pre-post btn btn-default" title='Linux实践 - 创建用户'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">Linux实践 - 创建用户</span>
+        </a>
     
     
         <a href="/2019/09/09/tcp-3-4/" class="next-post btn btn-default" title='从TCP的三次握手和四次挥手说起'>

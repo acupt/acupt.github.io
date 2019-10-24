@@ -34,7 +34,7 @@
     <!--Title-->
 
 
-<title>标签: cpu | 一杯82年的JAVA</title>
+<title>分类: linux | 一杯82年的JAVA</title>
 
 
     <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
@@ -157,9 +157,8 @@
     
     
         <li>
-            cpu
+            linux
         </li>
-    
     
 
 </ol>
@@ -170,26 +169,32 @@
         <div class="post-content">
             <div class="post-head home-post-head">
                 <h1 class="post-title">
-                    <a href="/2019/07/17/interview-cup-thread/">CPU占用高如何排查</a>
+                    <a href="/2019/10/24/linux-action/linux-action-1/">Linux实践 - 创建用户</a>
                 </h1>
                 <div class="post-meta">  &bull;
                     <time class="post-date" datetime="" title="">
-                        2019年07月17日
+                        2019年10月24日
                     </time>
                 </div>
             </div>
             <p class="brief">
                 
-                    
-程序里少不了运算，如果不是环境太恶劣，CPU基本是能支撑应用运行的。但如果发现CPU居高不下，就需要思考是否程序有问题。
+                    目标创建一个admin用户用于日常操作（root权限太高，不宜直接使用）。
+创建新用户
+adduser [用户名]
 
-当服务器CPU居高不下，可以从下面几个方面入手定位问题。
-找到JAVA进程 pid方法一: jps那个jar...
+1[root@VM_0_8_centos ~]# adduser admin
+设置密码
+passwd [用户名]
+
+...
                 
             </p>
         </div>
     </article>
  
+
+
 
 
 
