@@ -1,0 +1,381 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="一杯82年的JAVA">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="https://acupt.cn">
+    <!--SEO-->
+
+    <meta name="keywords" content="linux,centos" />
+
+
+    <meta name="description" content="目标搭建JAVA开发环境，可以支持简单的web应用。
+
+Java 8
+Git
+Mysql
+Maven
+Nginx
+
+Java 8推荐两种方式：
+
+yum 安装
+官网下载.rpm文件安装
+
+yum..." />
+
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+<meta name="google-site-verification" content="WlBG-_1cX3ycewbPVYnbA7sRJRj6i8QBgDPmQN9LO_g" />
+
+    <!--Title-->
+
+
+<title>Linux实践 - 开发环境 | 一杯82年的JAVA</title>
+
+
+    <link rel="alternate" href="/atom.xml" title="一杯82年的JAVA" type="application/atom+xml">
+
+
+    <link rel="icon" href="/img/favicon.ico">
+
+    
+
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.5.0">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash">
+
+
+
+
+    
+
+
+
+
+
+    
+
+    <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+</head>
+
+
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+
+<body>
+    <header class="main-header"  style="background-image:url(/img/banner.jpg)"  >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='ACUPT'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+        	<!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+                <h2> BUG本天成，妙手偶得之 </h2>
+            
+    	</div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                    <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="https://acupt.cn">一杯82年的JAVA</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/"><i class="fa "></i>HOME</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/微服务/"><i class="fa "></i>微服务</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/并发编程/"><i class="fa "></i>并发编程</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/面试杂谈/"><i class="fa "></i>面试杂谈</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/categories/实践笔记/"><i class="fa "></i>实践笔记</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/archives/"><i class="fa "></i>时间轴</a>
+                            </li>
+                        
+                            <li role="presentation" class="text-center">
+                                <a href="/about/"><i class="fa "></i>关于</a>
+                            </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Linux实践 - 开发环境">
+            
+	            Linux实践 - 开发环境
+            
+        </h1>
+        <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/linux/">linux</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/centos/">centos</a> <a class="tag-link" href="/tags/linux/">linux</a>
+                
+            </span>
+        </span>
+    
+
+    
+        
+        <span class="fa-wrap">
+            <i class="fa fa-clock-o"></i>
+            <span class="date-meta">2019/10/24</span>
+        </span>
+        
+            <span class="fa-wrap">
+                <i class="fa fa-eye"></i>
+                <span id="busuanzi_value_page_pv"></span>
+            </span>
+        
+    
+</div>
+            
+            
+    </div>
+    
+    <div class="post-body post-content">
+        <h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>搭建JAVA开发环境，可以支持简单的web应用。</p>
+<ul>
+<li>Java 8</li>
+<li>Git</li>
+<li>Mysql</li>
+<li>Maven</li>
+<li>Nginx</li>
+</ul>
+<h2 id="Java-8"><a href="#Java-8" class="headerlink" title="Java 8"></a>Java 8</h2><p>推荐两种方式：</p>
+<ol>
+<li>yum 安装</li>
+<li>官网下载.rpm文件安装</li>
+</ol>
+<h3 id="yum-安装"><a href="#yum-安装" class="headerlink" title="yum 安装"></a>yum 安装</h3><p>查看可安装的包，通过关键词过滤一下。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@VM_0_8_centos ~]<span class="comment"># yum list|grep java-1.8.0-openjdk</span></span><br><span class="line">java-1.8.0-openjdk.i686                 1:1.8.0.232.b09-0.el7_7        updates  </span><br><span class="line">java-1.8.0-openjdk.x86_64               1:1.8.0.232.b09-0.el7_7        updates  </span><br><span class="line">java-1.8.0-openjdk-devel.i686           1:1.8.0.232.b09-0.el7_7        updates  </span><br><span class="line">java-1.8.0-openjdk-devel.x86_64         1:1.8.0.232.b09-0.el7_7        updates  </span><br><span class="line">java-1.8.0-openjdk-devel-debug.i686     1:1.8.0.232.b09-0.el7_7        updates  </span><br><span class="line">java-1.8.0-openjdk-devel-debug.x86_64   1:1.8.0.232.b09-0.el7_7        updates </span><br><span class="line">...略</span><br></pre></td></tr></table></figure>
+<p>不需要Java8全家桶，来两个就行了。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行环境</span></span><br><span class="line">yum -y install java-1.8.0-openjdk.x86_64</span><br><span class="line"><span class="comment"># 开发环境</span></span><br><span class="line">yum -y install java-1.8.0-openjdk-devel.x86_64</span><br></pre></td></tr></table></figure>
+<h3 id="rpm-安装"><a href="#rpm-安装" class="headerlink" title="rpm 安装"></a>rpm 安装</h3><p><a href="https://my.oschina.net/liujiest/blog/634066" target="_blank" rel="noopener">略</a></p>
+<h2 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h2><p>使用yum命令安装。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum -y install git</span><br></pre></td></tr></table></figure>
+<p>安装完配置一下用户信息，不然等commit的时候会提示你设置。</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.email <span class="string">"邮箱@qq.com"</span></span><br><span class="line">git config --global user.name <span class="string">"昵称"</span></span><br></pre></td></tr></table></figure>
+<p>等push的时候会提示输入git服务器的用户名和密码，如果用的github，就是github的用户名和密码。</p>
+<p>如果使用http地址克隆，每次都会要求输入账号密码，可以设置缓存账号信息：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 项目根目录执行</span></span><br><span class="line">git config --global credential.helper store</span><br></pre></td></tr></table></figure>
+<p>如果使用ssh地址克隆，只需要配置权限，把本机公钥传到github:</p>
+<p><a href="https://github.com/settings/keys" target="_blank" rel="noopener">https://github.com/settings/keys</a></p>
+<h2 id="Mysql"><a href="#Mysql" class="headerlink" title="Mysql"></a>Mysql</h2><h3 id="安装Mysql"><a href="#安装Mysql" class="headerlink" title="安装Mysql"></a>安装Mysql</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># yum没有自带mysql，需要从官网获取</span></span><br><span class="line">wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm</span><br><span class="line"></span><br><span class="line"><span class="comment"># 需要root权限，前面加sudo或者用root用户</span></span><br><span class="line">rpm -ivh mysql-community-release-el7-5.noarch.rpm</span><br><span class="line"></span><br><span class="line"><span class="comment"># 同上（可能很慢）</span></span><br><span class="line">yum install mysql-community-server</span><br><span class="line"></span><br><span class="line"><span class="comment"># 成功安装之后重启mysql服务</span></span><br><span class="line">service mysqld restart</span><br></pre></td></tr></table></figure>
+<h3 id="设置密码"><a href="#设置密码" class="headerlink" title="设置密码"></a>设置密码</h3><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 初次安装mysql是root账户是没有密码的</span></span><br><span class="line"><span class="comment"># 设置密码如下</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 登录mysql（不需要密码）</span></span><br><span class="line">mysql -uroot</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置密码</span></span><br><span class="line">mysql&gt; <span class="built_in">set</span> password <span class="keyword">for</span> <span class="string">'root'</span>@<span class="string">'localhost'</span>=password(<span class="string">'your pwd'</span>);</span><br><span class="line">mysql&gt; <span class="built_in">exit</span></span><br></pre></td></tr></table></figure>
+<h3 id="允许远程连接Mysql"><a href="#允许远程连接Mysql" class="headerlink" title="允许远程连接Mysql"></a>允许远程连接Mysql</h3><p>想在其他电脑上连接服务器上的mysql，需要先配置权限</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入MySQL</span></span><br><span class="line">mysql -u root -p</span><br><span class="line"></span><br><span class="line"><span class="comment"># 打开mysql数据库</span></span><br><span class="line">mysql&gt; use mysql</span><br><span class="line"></span><br><span class="line"><span class="comment"># 将host设置为%表示任何ip都能连接mysql，也可以将host指定为某个ip</span></span><br><span class="line">mysql&gt; update user <span class="built_in">set</span> host=<span class="string">'%'</span> <span class="built_in">where</span> user=<span class="string">'root'</span> and host=<span class="string">'localhost'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 刷新权限表，使配置生效</span></span><br><span class="line">mysql&gt; flush privileges;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 想禁止远程连接时</span></span><br><span class="line"><span class="comment"># 将host设置为localhost表示只能本地连接mysql</span></span><br><span class="line">mysql&gt; update user <span class="built_in">set</span> host=<span class="string">'localhost'</span> <span class="built_in">where</span> user=<span class="string">'root'</span>;</span><br><span class="line">mysql&gt; flush privileges;</span><br></pre></td></tr></table></figure>
+<h2 id="Maven"><a href="#Maven" class="headerlink" title="Maven"></a>Maven</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 需要root权限</span></span><br><span class="line"></span><br><span class="line">wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo</span><br><span class="line"></span><br><span class="line">yum -y install apache-maven</span><br></pre></td></tr></table></figure>
+<h2 id="Nginx"><a href="#Nginx" class="headerlink" title="Nginx"></a>Nginx</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装nginx</span></span><br><span class="line">yum install nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动nginx</span></span><br><span class="line">service nginx start</span><br></pre></td></tr></table></figure>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改配置文件</span></span><br><span class="line">vim /etc/nginx/nginx.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 修改成如下，原来花括号里是空的</span></span><br><span class="line">location / &#123;</span><br><span class="line">    <span class="comment"># 把请求的ip设置到header里，不然web应用直接获取ip将会是本地地址</span></span><br><span class="line">    proxy_set_header X-real-ip <span class="variable">$remote_addr</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 转发请求到8080端口</span></span><br><span class="line">    proxy_pass http://127.0.0.1:8080;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使配置生效</span></span><br><span class="line">nginx -s reload</span><br></pre></td></tr></table></figure>
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+                转载声明：商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">ACUPT.CN</a>
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+
+<div class="article-nav prev-next-wrap clearfix">
+    
+        <a href="/2019/10/24/linux-action-adduser/" class="pre-post btn btn-default" title='Linux实践 - 创建用户'>
+            <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+            <span class="hidden-xs">Linux实践 - 创建用户</span>
+        </a>
+    
+    
+        <a href="/2019/09/29/distributed-schedule/" class="next-post btn btn-default" title='分布式场景下的定时任务实践'>
+            <span class="hidden-lg">下一篇</span>
+            <span class="hidden-xs">分布式场景下的定时任务实践</span><i class="fa fa-angle-right fa-fw"></i>
+        </a>
+    
+</div>
+
+
+    <div id="comments">
+        
+	<link rel="stylesheet" href="https://cdn.bootcss.com/gitalk/1.4.1/gitalk.min.css">
+<script src="//cdn.bootcss.com/gitalk/1.4.1/gitalk.min.js"></script>
+<script src="//cdn.bootcss.com/blueimp-md5/2.9.0/js/md5.min.js"></script>
+
+<div id="gitalk-container"></div>
+<script type="text/javascript">
+    var gitalk = new Gitalk({
+        // Gitalk配置
+        language: "zh-CN",
+        clientID: "db46aea74a4e374fe460",
+        clientSecret: "58f3300fa61b53cb5f785183e3430d0e7bc3a676",
+        repo: "acupt.github.io",
+        owner: "acupt",
+        admin: ["acupt"],
+        id: md5(location.pathname),
+        distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+</script>
+
+
+    </div>
+
+
+
+
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">文章目录</h3>
+        
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#目标"><span class="toc-text">目标</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java-8"><span class="toc-text">Java 8</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#yum-安装"><span class="toc-text">yum 安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rpm-安装"><span class="toc-text">rpm 安装</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Git"><span class="toc-text">Git</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Mysql"><span class="toc-text">Mysql</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安装Mysql"><span class="toc-text">安装Mysql</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#设置密码"><span class="toc-text">设置密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#允许远程连接Mysql"><span class="toc-text">允许远程连接Mysql</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Maven"><span class="toc-text">Maven</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Nginx"><span class="toc-text">Nginx</span></a></li></ol>
+        
+    </div>
+</aside>
+
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+
+<a id="back-to-top" class="icon-btn hide">
+	<i class="fa fa-chevron-up"></i>
+</a>
+
+
+
+
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+        访问量:
+        <strong id="busuanzi_value_site_pv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+        &nbsp; | &nbsp;
+        访客数:
+        <strong id="busuanzi_value_site_uv">
+            <i class="fa fa-spinner fa-spin"></i>
+        </strong>
+    
+</div>
+
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy; 2018
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script src="/js/app.js?rev=@@hash"></script>
+
+</body>
+</html>

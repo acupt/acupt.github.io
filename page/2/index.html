@@ -167,6 +167,68 @@
 <article class="post">
     
         <div class="post-media">
+            <a href="/2019/08/04/concurrent-lock-contention-reduce/">
+                <img class="img-ajax" src="/img/loading.gif"  data-src="/img/emoji/一人干活多人围观.jpeg"   alt="探索JAVA并发 - 如何减少锁的竞争">
+            </a>
+        </div>
+    
+    <div class="post-content">
+        <div class="post-head home-post-head">
+            <h1 class="post-title">
+                <a href="/2019/08/04/concurrent-lock-contention-reduce/">探索JAVA并发 - 如何减少锁的竞争</a>
+            </h1>
+            <div class="post-meta">  &bull;
+                <time class="post-date" datetime="" title="">
+                    2019年08月04日
+                </time>
+            </div>
+        </div>
+        <p class="brief">
+            
+                
+锁的竞争会限制代码的可伸缩性，在并发编程时通过一些手段有意地减少锁竞争，可以让程序有更好的表现。
+
+所谓可伸缩性，即当增加计算资源(如CPU、内存、带宽等)时，程序的吞吐量或处理能力会相应增加。这个时候，我们当然希望增加的效果越明显...
+            
+        </p>
+    </div>
+    
+        <footer class="post-footer clearfix">
+            <div class="pull-left tag-list">
+                <div class="post-meta">
+    
+        <span class="categories-meta fa-wrap">
+            <i class="fa fa-folder-open-o"></i>
+            <a class="category-link" href="/categories/并发编程/">并发编程</a>
+        </span>
+    
+
+    
+        <span class="fa-wrap">
+            <i class="fa fa-tags"></i>
+            <span class="tags-meta">
+                
+                    <a class="tag-link" href="/tags/并发/">并发</a> <a class="tag-link" href="/tags/线程/">线程</a> <a class="tag-link" href="/tags/锁/">锁</a>
+                
+            </span>
+        </span>
+    
+
+    
+</div>
+            </div>
+
+            <div class="post-permalink">
+                <a href="/2019/08/04/concurrent-lock-contention-reduce/" class="btn btn-default">阅读全文</a>
+            </div>
+        </footer>
+    
+</article>
+
+
+<article class="post">
+    
+        <div class="post-media">
             <a href="/2019/07/31/access-control-allow-origin/">
                 <img class="img-ajax" src="/img/loading.gif"  data-src="/img/acao/jsonp回调.png"   alt="跨域Access-Control-Allow-Origin解决方案">
             </a>
@@ -687,63 +749,6 @@ JAVA程序运行在虚拟机上(JVM)，JAVA程序执行完成，JVM也随之关�
 </article>
 
 
-<article class="post">
-    
-    <div class="post-content">
-        <div class="post-head home-post-head">
-            <h1 class="post-title">
-                <a href="/2019/07/17/java-string/">JAVA中的String真的不可变吗</a>
-            </h1>
-            <div class="post-meta">  &bull;
-                <time class="post-date" datetime="" title="">
-                    2019年07月17日
-                </time>
-            </div>
-        </div>
-        <p class="brief">
-            
-                
-String是不可变的吗？是的！真想变？也行~
-
-我们都知道，String是不可变对象，即一旦创建，那么就不能改变它的状态。对此，我们来分析一波。
-String的内部构造小心翼翼进入String的内部，我们可以看到它是一个final...
-            
-        </p>
-    </div>
-    
-        <footer class="post-footer clearfix">
-            <div class="pull-left tag-list">
-                <div class="post-meta">
-    
-        <span class="categories-meta fa-wrap">
-            <i class="fa fa-folder-open-o"></i>
-            <a class="category-link" href="/categories/JAVA/">JAVA</a>
-        </span>
-    
-
-    
-        <span class="fa-wrap">
-            <i class="fa fa-tags"></i>
-            <span class="tags-meta">
-                
-                    <a class="tag-link" href="/tags/java/">java</a>
-                
-            </span>
-        </span>
-    
-
-    
-</div>
-            </div>
-
-            <div class="post-permalink">
-                <a href="/2019/07/17/java-string/" class="btn btn-default">阅读全文</a>
-            </div>
-        </footer>
-    
-</article>
-
-
 
 
     <nav class="pagination" role="navigation">
@@ -789,15 +794,6 @@ String的内部构造小心翼翼进入String的内部，我们可以看到它�
 
         
         
-    <div class="widget">
-        <h3 class="title">网站公告</h3>
-        <div class="notification">
-            <p>
-    <a href="/about/" target="_blank">技术交流/群</a> <br>
-</p>
-        </div>
-    </div>
-
         
         
     <div class="widget">
@@ -812,10 +808,6 @@ String的内部构造小心翼翼进入String的内部，我们可以看到它�
 			    	<i class="envelope-o fa fa-envelope-o"></i>
 			    </a>
             
-	            <a href="/about/" rel="external nofollow" title="微信" target="_blank">
-			    	<i class="weixin fa fa-weixin"></i>
-			    </a>
-            
         </div>
     </div>
 
@@ -824,7 +816,7 @@ String的内部构造小心翼翼进入String的内部，我们可以看到它�
         
     <div class="widget">
         <h3 class="title">分类</h3>
-        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/"><i class="fa" aria-hidden="true">JAVA</i></a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实践笔记/"><i class="fa" aria-hidden="true">实践笔记</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发编程/"><i class="fa" aria-hidden="true">并发编程</i></a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务/"><i class="fa" aria-hidden="true">微服务</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络/"><i class="fa" aria-hidden="true">网络</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/"><i class="fa" aria-hidden="true">随笔</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/面试杂谈/"><i class="fa" aria-hidden="true">面试杂谈</i></a><span class="category-list-count">4</span></li></ul>
+        <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA/"><i class="fa" aria-hidden="true">JAVA</i></a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/linux/"><i class="fa" aria-hidden="true">linux</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实践笔记/"><i class="fa" aria-hidden="true">实践笔记</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/并发编程/"><i class="fa" aria-hidden="true">并发编程</i></a><span class="category-list-count">12</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务/"><i class="fa" aria-hidden="true">微服务</i></a><span class="category-list-count">11</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络/"><i class="fa" aria-hidden="true">网络</i></a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/随笔/"><i class="fa" aria-hidden="true">随笔</i></a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/面试杂谈/"><i class="fa" aria-hidden="true">面试杂谈</i></a><span class="category-list-count">4</span></li></ul>
     </div>
 
 
@@ -832,7 +824,7 @@ String的内部构造小心翼翼进入String的内部，我们可以看到它�
         
     <div class="widget">
         <h3 class="title">归档</h3>
-        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/"><i class="fa" aria-hidden="true">2019年10月</i></a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/"><i class="fa" aria-hidden="true">2019年09月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1900/01/"><i class="fa" aria-hidden="true">1900年01月</i></a><span class="archive-list-count">1</span></li></ul>
+        <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/10/"><i class="fa" aria-hidden="true">2019年10月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/09/"><i class="fa" aria-hidden="true">2019年09月</i></a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/08/"><i class="fa" aria-hidden="true">2019年08月</i></a><span class="archive-list-count">6</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/"><i class="fa" aria-hidden="true">2019年07月</i></a><span class="archive-list-count">15</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/11/"><i class="fa" aria-hidden="true">2018年11月</i></a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/10/"><i class="fa" aria-hidden="true">2018年10月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/"><i class="fa" aria-hidden="true">2018年05月</i></a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/1900/01/"><i class="fa" aria-hidden="true">1900年01月</i></a><span class="archive-list-count">1</span></li></ul>
     </div>
 
 
@@ -842,7 +834,7 @@ String的内部构造小心翼翼进入String的内部，我们可以看到它�
     <h3 class="title">标签云</h3>
     <div class="content tag-cloud">
         
-            <a href="/tags/JAVA/" style="font-size: 11.67px;">JAVA</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/centos/" style="font-size: 10px;">centos</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/cpu/" style="font-size: 10px;">cpu</a> <a href="/tags/eureka/" style="font-size: 15px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/github/" style="font-size: 11.67px;">github</a> <a href="/tags/grpc/" style="font-size: 13.33px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jvm/" style="font-size: 13.33px;">jvm</a> <a href="/tags/linux/" style="font-size: 10px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/oom/" style="font-size: 10px;">oom</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 13.33px;">rpc</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/thrift/" style="font-size: 13.33px;">thrift</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/同步/" style="font-size: 11.67px;">同步</a> <a href="/tags/容器/" style="font-size: 10px;">容器</a> <a href="/tags/并发/" style="font-size: 16.67px;">并发</a> <a href="/tags/微服务/" style="font-size: 18.33px;">微服务</a> <a href="/tags/死锁/" style="font-size: 10px;">死锁</a> <a href="/tags/泛型/" style="font-size: 10px;">泛型</a> <a href="/tags/类型擦除/" style="font-size: 10px;">类型擦除</a> <a href="/tags/线程/" style="font-size: 18.33px;">线程</a> <a href="/tags/线程池/" style="font-size: 10px;">线程池</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a> <a href="/tags/锁/" style="font-size: 15px;">锁</a>
+            <a href="/tags/JAVA/" style="font-size: 11.67px;">JAVA</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/actuator/" style="font-size: 10px;">actuator</a> <a href="/tags/centos/" style="font-size: 11.67px;">centos</a> <a href="/tags/config/" style="font-size: 10px;">config</a> <a href="/tags/cpu/" style="font-size: 10px;">cpu</a> <a href="/tags/eureka/" style="font-size: 15px;">eureka</a> <a href="/tags/filter/" style="font-size: 10px;">filter</a> <a href="/tags/gc/" style="font-size: 10px;">gc</a> <a href="/tags/github/" style="font-size: 11.67px;">github</a> <a href="/tags/grpc/" style="font-size: 13.33px;">grpc</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/java/" style="font-size: 10px;">java</a> <a href="/tags/jvm/" style="font-size: 13.33px;">jvm</a> <a href="/tags/linux/" style="font-size: 11.67px;">linux</a> <a href="/tags/maven/" style="font-size: 10px;">maven</a> <a href="/tags/oom/" style="font-size: 10px;">oom</a> <a href="/tags/rabbitmq/" style="font-size: 10px;">rabbitmq</a> <a href="/tags/rpc/" style="font-size: 13.33px;">rpc</a> <a href="/tags/spring/" style="font-size: 20px;">spring</a> <a href="/tags/thrift/" style="font-size: 13.33px;">thrift</a> <a href="/tags/分布式/" style="font-size: 10px;">分布式</a> <a href="/tags/同步/" style="font-size: 11.67px;">同步</a> <a href="/tags/容器/" style="font-size: 10px;">容器</a> <a href="/tags/并发/" style="font-size: 16.67px;">并发</a> <a href="/tags/微服务/" style="font-size: 18.33px;">微服务</a> <a href="/tags/死锁/" style="font-size: 10px;">死锁</a> <a href="/tags/泛型/" style="font-size: 10px;">泛型</a> <a href="/tags/类型擦除/" style="font-size: 10px;">类型擦除</a> <a href="/tags/线程/" style="font-size: 18.33px;">线程</a> <a href="/tags/线程池/" style="font-size: 10px;">线程池</a> <a href="/tags/责任链/" style="font-size: 10px;">责任链</a> <a href="/tags/跨域/" style="font-size: 10px;">跨域</a> <a href="/tags/锁/" style="font-size: 15px;">锁</a>
         
     </div>
   </div>
@@ -889,7 +881,7 @@ String的内部构造小心翼翼进入String的内部，我们可以看到它�
 
             </div>
             <div class="col-sm-12">
-                <span>Copyright &copy; 2018 | 微信公众号 ~ 一杯82年的JAVA
+                <span>Copyright &copy; 2018
                 </span> |
                 <span>
                     Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
